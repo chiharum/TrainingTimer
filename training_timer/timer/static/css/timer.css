@@ -1,0 +1,8 @@
+div#timer_stage_frame{
+    overflow-x: auto;
+}
+
+div#timer_stage {
+    height: 500px;
+    /* width: 1000px; */
+}
