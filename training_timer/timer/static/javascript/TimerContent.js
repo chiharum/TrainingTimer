@@ -10,8 +10,8 @@ const ContentTopMargin = 10;
 const ButtonInputMargin = 10;
 const InputTextMargin = 5;
 // value
-const DefaultTimerDuration = 0;
-const DefaltTimerRepeatNum = 1;
+const DefaultDuration = 0;
+const DefaultRepeatNum = 1;
 const BoolDefaultSuspendingMode = false;
 const StringTimesText = "×";
 const StringDurationDot = ":";
@@ -63,43 +63,43 @@ class SingleInput {
         this.topCenterCoordinate = top_center_coordinate;
         this.startCoordinate = this.getStartCoordinate();
 
-        this.underbar = this.drawNewInputUnderbar(startCoordinate, this.input.clientWidth);
+        this.underbar = this.drawNewInputUnderbar(this.startCoordinate, this.input.clientWidth);
     }
 
-    get singleInputLayer() {
-        return this.singleInputLayer;
-    }
+    // get singleInputLayer() {
+    //     return this.singleInputLayer;
+    // }
 
-    get startCoordinate() {
-        return this.startCoordinate;
-    }
+    // get startCoordinate() {
+    //     return this.startCoordinate;
+    // }
 
-    get input() {
-        return this.input;
-    }
+    // get input() {
+    //     return this.input;
+    // }
 
-    get valueInStr() {
-        return this.valueInStr;
-    }
+    // get valueInStr() {
+    //     return this.valueInStr;
+    // }
 
-    get topCenterCoordinate() {
-        return this.topCenterCoordinate;
-    }
+    // get topCenterCoordinate() {
+    //     return this.topCenterCoordinate;
+    // }
 
-    get underbar() {
-        return this.underbar;
-    }
+    // get underbar() {
+    //     return this.underbar;
+    // }
 
-    set valueInStr(new_val_str) {
+    // set startCoordinate(new_start_coordinate) {
+    //     this.startCoordinate = new_start_coordinate;
+    // }
+
+    setValueInStr(new_val_str) {
         this.setInputStyle(this.input, this.getStartCoordinate(), new_val_str);
         this.valueInStr = new_val_str;
     }
 
-    set startCoordinate(new_start_coordinate) {
-        this.startCoordinate = new_start_coordinate;
-    }
-
-    set topCenterCoordinate(new_top_center_coordinate) {
+    setTopCenterCoordinate(new_top_center_coordinate) {
         this.topCenterCoordinate = new_top_center_coordinate;
         this.startCoordinate = this.getStartCoordinate();
         this.setInputStyle(this.input, this.startCoordinate, this.valueInStr);
@@ -118,8 +118,8 @@ class SingleInput {
 
     getInputTextStyle(start_coordinate, value) {
         let style = "position:absolute;"
-            + "left:" + (start_coordinate[0] == undefined ? 0 : start_coordinate[0]) + CssPositionUnit + ";"
-            + "top:" + (start_coordinate[1] == undefined ? 0 : start_coordinate[1]) + CssPositionUnit + ";"
+            + "left:" + (start_coordinate == undefined ? 0 : start_coordinate[0]) + CssPositionUnit + ";"
+            + "top:" + (start_coordinate == undefined ? 0 : start_coordinate[1]) + CssPositionUnit + ";"
             + "height:" + InputFontSize + CssPositionUnit + ";"
             + "width:" + (value.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
             + "font-size:" + InputFontSize + CssPositionUnit + ";"
@@ -168,27 +168,27 @@ class SingleInputAndButton {
         this.upDownButtonLayer = acgraph.layer();
     }
 
-    get upDownButtonLayer() {
-        return this.upDownButtonLayer;
-    }
+    // get upDownButtonLayer() {
+    //     return this.upDownButtonLayer;
+    // }
 
-    get inputNum() {
-        return this.inputNum;
-    }
+    // get inputNum() {
+    //     return this.inputNum;
+    // }
 
-    get keepTwoDigits() {
-        return this.keepTwoDigits;
-    }
+    // get keepTwoDigits() {
+    //     return this.keepTwoDigits;
+    // }
 
-    get inputTextStr() {
-        return this.inputTextStr;
-    }
+    // get inputTextStr() {
+    //     return this.inputTextStr;
+    // }
 
     getPresentInputTextStr() {
-        if (this.keepTwoDigits && inputNum <= 9) {
-            return '0' + toString(inputNum);
+        if (this.keepTwoDigits && this.inputNum <= 9) {
+            return '0' + toString(this.inputNum);
         } else {
-            return toString(inputNum);
+            return toString(this.inputNum);
         }
     }
 
@@ -247,286 +247,298 @@ class SingleInputAndButton {
 class TimerContent {
 
     constructor(parent_single_timer) {
-        this.timer_duration = DefaultTimerDuration;
+        this.parentTimer = parent_single_timer;
 
-        // this.timer_repeat_num = default_timer_repeat;
-        this.timer_repeat_num = parent_single_timer.getId;
+        this.durationSec = DefaultDuration;
 
-        this.bool_halt_mode = BoolDefaultSuspendingMode;
-        this.content_layer;
-        this.parent_single_timer = parent_single_timer;
+        this.repeatNum = DefaultRepeatNum;
 
-        this.repeat_input;
-        this.duration_min_input;
-        this.duration_sec_input;
+        this.boolSuspendingMode = BoolDefaultSuspendingMode;
+        this.contentLayer = acgraph.layer();
 
-        // this.duration_dot_width;
+        this.repeatInput = new SingleInputAndButton(this.repeatNum, false, this.getPresentRepeatInputCoordinate);
+
+        // minとsec一緒にしたclassつくるか
+        this.durationMinInput = new SingleInputAndButton();
+        this.durationSecInput;
     }
 
-    get getContentLayer() {
-        return this.content_layer;
-    }
+    // get contentLayer() {
+    //     return this.contentLayer;
+    // }
 
-    get getRepeatNum() {
-        return this.timer_repeat_num;
-    }
+    // get repeatNum() {
+    //     return this.repeatNum;
+    // }
 
-    get getMinAndSecString() {
-        let min = this.timer_duration / 60;
-        let sec = this.timer_duration % 60;
-        let min_string = (min < 10 ? '0' + min.toString(10) : min.toString(10));
-        let sec_string = (sec < 10 ? '0' + sec.toString(10) : sec.toString(10));
-        return [min_string, sec_string];
-    }
+    // // いらない
+    // getMinAndSecString() {
+    //     let min = this.durationSec / 60;
+    //     let sec = this.durationSec % 60;
+    //     let min_string = (min < 10 ? '0' + min.toString(10) : min.toString(10));
+    //     let sec_string = (sec < 10 ? '0' + sec.toString(10) : sec.toString(10));
+    //     return [min_string, sec_string];
+    // }
 
-    get getRepeatInput() {
-        return this.repeat_input;
-    }
+    // get repeatInput() {
+    //     return this.repeatInput;
+    // }
 
-    get getDurationMinInput() {
-        return this.duration_min_input;
-    }
+    // get durationMinInput() {
+    //     return this.durationMinInput;
+    // }
 
-    get getDurationSecInput() {
-        return this.duration_sec_input;
-    }
+    // get durationSecInput() {
+    //     return this.durationSecInput;
+    // }
 
-    setRepeatInput(repeat_input) {
-        this.repeat_input = repeat_input;
-    }
+    // set repeatInput(new_repeat_input) {
+    //     this.repeatInput = new_repeat_input;
+    // }
 
+    // 以下二つ不要
     setDurationMinInput(duration_min_input) {
-        this.duration_min_input = duration_min_input;
+        this.durationMinInput = duration_min_input;
     }
 
     setDurationSecInput(duration_sec_input) {
-        this.duration_sec_input = duration_sec_input;
+        this.durationSecInput = duration_sec_input;
     }
+    // 以上二つ不要
 
-    setContentStartCoordinate(x, y) {
-        let content_layer = this.getContentLayer;
+    moveAllContent(x, y) {
+        let content_layer = this.contentLayer;
         content_layer.setPosition(x, y);
 
-        // inputの位置変える
+        // TBD
     }
 
-    getContentLayerCoordinate() {
-        let parent_single_timer_coordinate = this.parent_single_timer.getCoordinate;
-        let x = parent_single_timer_coordinate[0];
-        let y = parent_single_timer_coordinate[1];
+    getPresentRepeatInputCoordinate() {
+        let contentStartCoordinate = this.parentTimer.groupStartCoordinate;
+        let x = contentStartCoordinate[0] + TimerRectSize[0] / 2;
+        let y = contentStartCoordinate[1] + ContentTopMargin;
+
         return [x, y];
     }
 
-    getRepeatInputUpStartCoordinate() {
-        let x = this.parent_single_timer.getCoordinate[0] + timer_rect_size[0] / 2;
-        let y = this.parent_single_timer.getCoordinate[1] + ContentTopMargin;
-        return [x, y];
-    }
+    /*
+    以下不要かも～
+    */
+    // getContentLayerCoordinate() {
+    //     let parent_single_timer_coordinate = this.parentTimer.getCoordinate;
+    //     let x = parent_single_timer_coordinate[0];
+    //     let y = parent_single_timer_coordinate[1];
+    //     return [x, y];
+    // }
 
-    getRepeatInputTextStartCoordinate() {
-        let repeat_num_digit = this.timer_repeat_num.toString(10).length;
-        let x = this.parent_single_timer.getCoordinate[0] + (timer_rect_size[0] / 2) - (repeat_num_digit * InputFontSize / 2);
-        let y = this.parent_single_timer.getCoordinate[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin;
-        return [x, y];
-    }
+    // getRepeatInputUpStartCoordinate() {
+    //     let x = this.parentTimer.getCoordinate[0] + TimerRectSize[0] / 2;
+    //     let y = this.parentTimer.getCoordinate[1] + ContentTopMargin;
+    //     return [x, y];
+    // }
 
-    getRepeatInputTimesTextCoordinate(repeat_input_start_coordinate) {
-        let x = repeat_input_start_coordinate[0] - InputTextMargin - (TimesTextFontSize * StringTimesText.length);
-        let y = repeat_input_start_coordinate[1] + (InputFontSize - TimesTextFontSize) / 2;
-        return [x, y];
-    }
+    // getRepeatInputTextStartCoordinate() {
+    //     let repeat_num_digit = this.repeatNum.toString(10).length;
+    //     let x = this.parentTimer.getCoordinate[0] + (TimerRectSize[0] / 2) - (repeat_num_digit * InputFontSize / 2);
+    //     let y = this.parentTimer.getCoordinate[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin;
+    //     return [x, y];
+    // }
 
-    getRepeatInputDownStartCoordinate() {
-        let x = this.parent_single_timer.getCoordinate[0] + timer_rect_size[0] / 2;
-        let y = this.getRepeatInputTextStartCoordinate()[1] + InputFontSize + InputUnderbarHeight + ButtonInputMargin + UpDownTriangleHeight;
-        return [x, y];
-    }
+    // getRepeatInputTimesTextCoordinate(repeat_input_start_coordinate) {
+    //     let x = repeat_input_start_coordinate[0] - InputTextMargin - (TimesTextFontSize * StringTimesText.length);
+    //     let y = repeat_input_start_coordinate[1] + (InputFontSize - TimesTextFontSize) / 2;
+    //     return [x, y];
+    // }
 
-    getDurationDotTextStartTopCoordinate(duration_dot_width, repeat_input_down_start_coordinate) {
-        let x = this.parent_single_timer.getCoordinate[0] + (timer_rect_size[0] / 2) - (duration_dot_width / 2);
-        let y = repeat_input_down_start_coordinate[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin + (InputFontSize - DurationDotFontSize) / 2;
-        return [x, y];
-    }
+    // getRepeatInputDownStartCoordinate() {
+    //     let x = this.parentTimer.getCoordinate[0] + TimerRectSize[0] / 2;
+    //     let y = this.getRepeatInputTextStartCoordinate()[1] + InputFontSize + InputUnderbarHeight + ButtonInputMargin + UpDownTriangleHeight;
+    //     return [x, y];
+    // }
 
-    setDurationDotTextStartCoordinate(duration_dot_text, coordinate) {
-        duration_dot_text.setPosition(coordinate[0], coordinate[1]);
-    }
+    // getDurationDotTextStartTopCoordinate(duration_dot_width, repeat_input_down_start_coordinate) {
+    //     let x = this.parentTimer.getCoordinate[0] + (TimerRectSize[0] / 2) - (duration_dot_width / 2);
+    //     let y = repeat_input_down_start_coordinate[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin + (InputFontSize - DurationDotFontSize) / 2;
+    //     return [x, y];
+    // }
 
-    getDurationMinInputStartCoordinate(min_input_width, duration_dot_text_start_coordinate) {
-        let x = duration_dot_text_start_coordinate[0] - InputTextMargin - min_input_width;
-        let y = this.getRepeatInputDownStartCoordinate()[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin;
-        return [x, y];
-    }
+    // setDurationDotTextStartCoordinate(duration_dot_text, coordinate) {
+    //     duration_dot_text.setPosition(coordinate[0], coordinate[1]);
+    // }
 
-    getDurationInputMinUpTriangleStartCoordinate(min_input_width, duration_min_input_start_coordinate) {
-        let min_text_start_coordinate_x = duration_min_input_start_coordinate[0];
-        let min_text_end_coordinate_x = min_text_start_coordinate_x + min_input_width;
-        let x = (min_text_start_coordinate_x + min_text_end_coordinate_x) / 2;
-        let y = duration_min_input_start_coordinate[1] - ButtonInputMargin - UpDownTriangleHeight;
-        return [x, y];
-    }
+    // getDurationMinInputStartCoordinate(min_input_width, duration_dot_text_start_coordinate) {
+    //     let x = duration_dot_text_start_coordinate[0] - InputTextMargin - min_input_width;
+    //     let y = this.getRepeatInputDownStartCoordinate()[1] + ContentTopMargin + UpDownTriangleHeight + ButtonInputMargin;
+    //     return [x, y];
+    // }
 
-    getDurationInputMinDownTriangleStartCoordinate(duration_min_input_up_triangle_start_coordinate) {
-        let x = duration_min_input_up_triangle_start_coordinate[0];
-        let y = duration_min_input_up_triangle_start_coordinate[1] + UpDownTriangleHeight + ButtonInputMargin + InputFontSize + ButtonInputMargin + UpDownTriangleHeight;
-        return [x, y];
-    }
+    // getDurationInputMinUpTriangleStartCoordinate(min_input_width, duration_min_input_start_coordinate) {
+    //     let min_text_start_coordinate_x = duration_min_input_start_coordinate[0];
+    //     let min_text_end_coordinate_x = min_text_start_coordinate_x + min_input_width;
+    //     let x = (min_text_start_coordinate_x + min_text_end_coordinate_x) / 2;
+    //     let y = duration_min_input_start_coordinate[1] - ButtonInputMargin - UpDownTriangleHeight;
+    //     return [x, y];
+    // }
 
-    getDurationSecInputStartCoordinate(duration_dot_text_start_coordinate, duration_min_input_start_coordinate, duration_dot_text_width) {
-        let x = duration_dot_text_start_coordinate[0] + duration_dot_text_width + InputTextMargin;
-        let y = duration_min_input_start_coordinate[1];
-        return [x, y];
-    }
+    // getDurationInputMinDownTriangleStartCoordinate(duration_min_input_up_triangle_start_coordinate) {
+    //     let x = duration_min_input_up_triangle_start_coordinate[0];
+    //     let y = duration_min_input_up_triangle_start_coordinate[1] + UpDownTriangleHeight + ButtonInputMargin + InputFontSize + ButtonInputMargin + UpDownTriangleHeight;
+    //     return [x, y];
+    // }
 
-    getDurationSecInputUpTriangleStartCoordinate(duration_sec_input_start_coordinate, duration_sec_input_width) {
-        let x = duration_sec_input_start_coordinate[0] + (duration_sec_input_width / 2);
-        let y = duration_sec_input_start_coordinate[1] - ButtonInputMargin - UpDownTriangleHeight;
-        return [x, y];
-    }
+    // getDurationSecInputStartCoordinate(duration_dot_text_start_coordinate, duration_min_input_start_coordinate, duration_dot_text_width) {
+    //     let x = duration_dot_text_start_coordinate[0] + duration_dot_text_width + InputTextMargin;
+    //     let y = duration_min_input_start_coordinate[1];
+    //     return [x, y];
+    // }
 
-    getDurationSecInputDownTriangleStartCoordinate(duration_sec_input_up_triangle_start_coordinate) {
-        let x = duration_sec_input_up_triangle_start_coordinate[0];
-        let y = duration_sec_input_up_triangle_start_coordinate[1] + UpDownTriangleHeight + ButtonInputMargin + InputFontSize + ButtonInputMargin + UpDownTriangleHeight;
-        return [x, y];
-    }
+    // getDurationSecInputUpTriangleStartCoordinate(duration_sec_input_start_coordinate, duration_sec_input_width) {
+    //     let x = duration_sec_input_start_coordinate[0] + (duration_sec_input_width / 2);
+    //     let y = duration_sec_input_start_coordinate[1] - ButtonInputMargin - UpDownTriangleHeight;
+    //     return [x, y];
+    // }
 
-    drawTriangle(start_coordinate, bool_is_up) {
-        const triangle_point_set = getTrianglePointSet(start_coordinate, bool_is_up);
-        let triangle = acgraph.path();
-        triangle.stroke(0);
-        triangle.moveTo(triangle_point_set[0][0], triangle_point_set[0][1]);
-        triangle.lineTo(triangle_point_set[1][0], triangle_point_set[1][1]);
-        triangle.lineTo(triangle_point_set[2][0], triangle_point_set[2][1]);
-        triangle.close();
-        triangle.fill(color_light_blue);
-        triangle.parent(this.getContentLayer);
+    // getDurationSecInputDownTriangleStartCoordinate(duration_sec_input_up_triangle_start_coordinate) {
+    //     let x = duration_sec_input_up_triangle_start_coordinate[0];
+    //     let y = duration_sec_input_up_triangle_start_coordinate[1] + UpDownTriangleHeight + ButtonInputMargin + InputFontSize + ButtonInputMargin + UpDownTriangleHeight;
+    //     return [x, y];
+    // }
 
-        return triangle;
-    }
+    // drawTriangle(start_coordinate, bool_is_up) {
+    //     const triangle_point_set = getTrianglePointSet(start_coordinate, bool_is_up);
+    //     let triangle = acgraph.path();
+    //     triangle.stroke(0);
+    //     triangle.moveTo(triangle_point_set[0][0], triangle_point_set[0][1]);
+    //     triangle.lineTo(triangle_point_set[1][0], triangle_point_set[1][1]);
+    //     triangle.lineTo(triangle_point_set[2][0], triangle_point_set[2][1]);
+    //     triangle.close();
+    //     triangle.fill(color_light_blue);
+    //     triangle.parent(this.contentLayer);
 
-    getInputTextStyle(start_coordinate, value) {
-        let style = "position:absolute;"
-            + "left:" + start_coordinate[0] + CssPositionUnit + ";"
-            + "top:" + start_coordinate[1] + CssPositionUnit + ";"
-            + "height:" + InputFontSize + CssPositionUnit + ";"
-            + "width:" + (value.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
-            + "font-size:" + InputFontSize + CssPositionUnit + ";"
-            + "text-align: center; border: none; background: none;";
+    //     return triangle;
+    // }
 
-        return style;
-    }
+    // getInputTextStyle(start_coordinate, value) {
+    //     let style = "position:absolute;"
+    //         + "left:" + start_coordinate[0] + CssPositionUnit + ";"
+    //         + "top:" + start_coordinate[1] + CssPositionUnit + ";"
+    //         + "height:" + InputFontSize + CssPositionUnit + ";"
+    //         + "width:" + (value.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
+    //         + "font-size:" + InputFontSize + CssPositionUnit + ";"
+    //         + "text-align: center; border: none; background: none;";
 
-    drawInput(start_coordinate, default_value) {
-        let input_text = document.createElement('input');
-        document.getElementById("text_layer_in_timer_stage").appendChild(input_text);
-        input_text.type = "text";
-        input_text.value = default_value;
-        input_text.style.cssText = this.getInputTextStyle(start_coordinate, default_value);    // font-size: 100%;
+    //     return style;
+    // }
 
-        return input_text;
-    }
+    // drawInput(start_coordinate, default_value) {
+    //     let input_text = document.createElement('input');
+    //     document.getElementById("text_layer_in_timer_stage").appendChild(input_text);
+    //     input_text.type = "text";
+    //     input_text.value = default_value;
+    //     input_text.style.cssText = this.getInputTextStyle(start_coordinate, default_value);    // font-size: 100%;
 
-    drawInputUnderbar(input_text_start_coordinate, input_text_width) {
-        let underbar_size = [input_text_width, InputUnderbarHeight];
-        let underbar = acgraph.rect(input_text_start_coordinate[0], input_text_start_coordinate[1] + InputFontSize, underbar_size[0], underbar_size[1]);
-        underbar.stroke(0);
-        underbar.fill(input_bar_gray);
-        underbar.parent(this.getContentLayer);
+    //     return input_text;
+    // }
 
-        return underbar;
-    }
+    // drawInputUnderbar(input_text_start_coordinate, input_text_width) {
+    //     let underbar_size = [input_text_width, InputUnderbarHeight];
+    //     let underbar = acgraph.rect(input_text_start_coordinate[0], input_text_start_coordinate[1] + InputFontSize, underbar_size[0], underbar_size[1]);
+    //     underbar.stroke(0);
+    //     underbar.fill(input_bar_gray);
+    //     underbar.parent(this.contentLayer);
 
-    setInputCoordinate(input, start_coordinate, set_value) {
-        input.style.cssText = this.getInputTextStyle(start_coordinate, set_value);
-    }
+    //     return underbar;
+    // }
 
-    setAllInputCoordinate() {
-        let repeat_input = this.getRepeatInput;
-        let repeat_input_start_coordiante = this.getRepeatInputTextStartCoordinate();
-        this.setInputCoordinate(repeat_input, repeat_input_start_coordiante, this.getRepeatNum);
+    // setInputCoordinate(input, start_coordinate, set_value) {
+    //     input.style.cssText = this.getInputTextStyle(start_coordinate, set_value);
+    // }
 
-        let duration_min_input = this.getDurationMinInput;
-        let duration_min_width = duration_min_input.clientWidth;
-        let duration_min_input_start_coordinate = this.getDurationMinInputStartCoordinate(duration_min_width)
-    }
+    // setAllInputCoordinate() {
+    //     let repeat_input = this.repeatInput;
+    //     let repeat_input_start_coordiante = this.getRepeatInputTextStartCoordinate();
+    //     this.setInputCoordinate(repeat_input, repeat_input_start_coordiante, this.repeatNum);
 
-    setContentLayerCoordinate() {
-        let content_layer = this.getContentLayer;
-        let parent_single_timer_coordinate = this.parent_single_timer.getCoordinate;
-        content_layer.setPosition(parent_single_timer_coordinate[0], parent_single_timer_coordinate[1]);
-    }
+    //     let duration_min_input = this.durationMinInput;
+    //     let duration_min_width = duration_min_input.clientWidth;
+    //     let duration_min_input_start_coordinate = this.getDurationMinInputStartCoordinate(duration_min_width)
+    // }
 
-    drawContent() {
-        let content_layer = acgraph.layer();
-        this.content_layer = content_layer;
-        let content_layer_coordinate = this.getContentLayerCoordinate();
-        let content_layer_rect = acgraph.rect(content_layer_coordinate[0], content_layer_coordinate[1], timer_rect_size[0], timer_rect_size[1]);
-        content_layer.clip(content_layer_rect);
+    // setContentLayerCoordinate() {
+    //     let content_layer = this.contentLayer;
+    //     let parent_single_timer_coordinate = this.parentTimer.getCoordinate;
+    //     content_layer.setPosition(parent_single_timer_coordinate[0], parent_single_timer_coordinate[1]);
+    // }
 
-        // repeat input up triangle
-        const repeat_input_up_triangle_start_coordinate = this.getRepeatInputUpStartCoordinate();
-        let repeat_input_up_triangle = this.drawTriangle(repeat_input_up_triangle_start_coordinate, true);
+    // drawContent() {
+    //     let content_layer_coordinate = this.getContentLayerCoordinate();
+    //     let content_layer_rect = acgraph.rect(content_layer_coordinate[0], content_layer_coordinate[1], TimerRectSize[0], TimerRectSize[1]);
+    //     this.contentLayer.clip(content_layer_rect);
 
-        // repeat input
-        let repeat_input_start_coordiante = this.getRepeatInputTextStartCoordinate();
-        let repeat_input = this.drawInput(repeat_input_start_coordiante, this.timer_repeat_num);
-        let repeat_input_width = repeat_input.clientWidth;
-        this.setRepeatInput(repeat_input);
+    //     // repeat input up triangle
+    //     const repeat_input_up_triangle_start_coordinate = this.getRepeatInputUpStartCoordinate();
+    //     let repeat_input_up_triangle = this.drawTriangle(repeat_input_up_triangle_start_coordinate, true);
 
-        // repeat input underbar
-        this.drawInputUnderbar(repeat_input_start_coordiante, repeat_input_width);
+    //     // repeat input
+    //     let repeat_input_start_coordiante = this.getRepeatInputTextStartCoordinate();
+    //     let repeat_input = this.drawInput(repeat_input_start_coordiante, this.repeatNum);
+    //     let repeat_input_width = repeat_input.clientWidth;
+    //     this.setRepeatInput(repeat_input);
 
-        // times text
-        const repeat_input_times_text_coordinate = this.getRepeatInputTimesTextCoordinate(repeat_input_start_coordiante);
-        let repeat_input_times_text = acgraph.text(repeat_input_times_text_coordinate[0], repeat_input_times_text_coordinate[1], StringTimesText);
-        repeat_input_times_text.fontSize(TimesTextFontSize);
-        repeat_input_times_text.parent(content_layer);
+    //     // repeat input underbar
+    //     this.drawInputUnderbar(repeat_input_start_coordiante, repeat_input_width);
 
-        // repeat input down triangle
-        const repeat_input_down_triangle_start_coordinate = this.getRepeatInputDownStartCoordinate();
-        let repeat_input_down_triangle = this.drawTriangle(repeat_input_down_triangle_start_coordinate, false);
+    //     // times text
+    //     const repeat_input_times_text_coordinate = this.getRepeatInputTimesTextCoordinate(repeat_input_start_coordiante);
+    //     let repeat_input_times_text = acgraph.text(repeat_input_times_text_coordinate[0], repeat_input_times_text_coordinate[1], StringTimesText);
+    //     repeat_input_times_text.fontSize(TimesTextFontSize);
+    //     repeat_input_times_text.parent(this.contentLayer);
 
-        // duration dot
-        let duration_dot_text = acgraph.text(0, 0, StringDurationDot);
-        duration_dot_text.fontSize(DurationDotFontSize);
-        duration_dot_text.parent(content_layer);
-        let duration_dot_text_width = duration_dot_text.getWidth();
-        const duration_dot_text_start_coordinate = this.getDurationDotTextStartTopCoordinate(duration_dot_text_width, repeat_input_down_triangle_start_coordinate);
-        this.setDurationDotTextStartCoordinate(duration_dot_text, duration_dot_text_start_coordinate);
+    //     // repeat input down triangle
+    //     const repeat_input_down_triangle_start_coordinate = this.getRepeatInputDownStartCoordinate();
+    //     let repeat_input_down_triangle = this.drawTriangle(repeat_input_down_triangle_start_coordinate, false);
 
-        // duration min input
-        let duration_min_input = this.drawInput([0, 0], this.getMinAndSecString[0]);
-        let duration_min_input_width = duration_min_input.clientWidth;
-        const duration_min_input_start_coordinate = this.getDurationMinInputStartCoordinate(duration_min_input_width, duration_dot_text_start_coordinate);
-        this.setInputCoordinate(duration_min_input, duration_min_input_start_coordinate, this.getMinAndSecString[0]);
-        this.setDurationMinInput(duration_min_input);
+    //     // duration dot
+    //     let duration_dot_text = acgraph.text(0, 0, StringDurationDot);
+    //     duration_dot_text.fontSize(DurationDotFontSize);
+    //     duration_dot_text.parent(this.contentLayer);
+    //     let duration_dot_text_width = duration_dot_text.getWidth();
+    //     const duration_dot_text_start_coordinate = this.getDurationDotTextStartTopCoordinate(duration_dot_text_width, repeat_input_down_triangle_start_coordinate);
+    //     this.setDurationDotTextStartCoordinate(duration_dot_text, duration_dot_text_start_coordinate);
 
-        // duration min input bar
-        let duration_min_input_underbar = this.drawInputUnderbar(duration_min_input_start_coordinate, duration_min_input_width);
+    //     // duration min input
+    //     let duration_min_input = this.drawInput([0, 0], this.getMinAndSecString[0]);
+    //     let duration_min_input_width = duration_min_input.clientWidth;
+    //     const duration_min_input_start_coordinate = this.getDurationMinInputStartCoordinate(duration_min_input_width, duration_dot_text_start_coordinate);
+    //     this.setInputCoordinate(duration_min_input, duration_min_input_start_coordinate, this.getMinAndSecString[0]);
+    //     this.setDurationMinInput(duration_min_input);
 
-        // duration min input up triangle
-        const duration_input_min_up_triangle_start_coordinate = this.getDurationInputMinUpTriangleStartCoordinate(duration_min_input_width, duration_min_input_start_coordinate);
-        let duration_input_min_up_triangle = this.drawTriangle(duration_input_min_up_triangle_start_coordinate, true);
+    //     // duration min input bar
+    //     let duration_min_input_underbar = this.drawInputUnderbar(duration_min_input_start_coordinate, duration_min_input_width);
 
-        // duration min input down triangle
-        const duration_input_min_down_triangle_start_coordinate = this.getDurationInputMinDownTriangleStartCoordinate(duration_input_min_up_triangle_start_coordinate);
-        let duration_input_min_down_triangle = this.drawTriangle(duration_input_min_down_triangle_start_coordinate, false);
+    //     // duration min input up triangle
+    //     const duration_input_min_up_triangle_start_coordinate = this.getDurationInputMinUpTriangleStartCoordinate(duration_min_input_width, duration_min_input_start_coordinate);
+    //     let duration_input_min_up_triangle = this.drawTriangle(duration_input_min_up_triangle_start_coordinate, true);
 
-        // duration sec input
-        const duration_input_sec_start_coordinate = this.getDurationSecInputStartCoordinate(duration_dot_text_start_coordinate, duration_min_input_start_coordinate, duration_dot_text_width);
-        let duration_sec_input = this.drawInput(duration_input_sec_start_coordinate, this.getMinAndSecString[1]);
-        let duration_sec_input_width = duration_sec_input.clientWidth;
-        this.setDurationSecInput(duration_sec_input);
+    //     // duration min input down triangle
+    //     const duration_input_min_down_triangle_start_coordinate = this.getDurationInputMinDownTriangleStartCoordinate(duration_input_min_up_triangle_start_coordinate);
+    //     let duration_input_min_down_triangle = this.drawTriangle(duration_input_min_down_triangle_start_coordinate, false);
 
-        // duration sec input underbar
-        let duration_sec_input_underbar = this.drawInputUnderbar(duration_input_sec_start_coordinate, duration_sec_input_width);
+    //     // duration sec input
+    //     const duration_input_sec_start_coordinate = this.getDurationSecInputStartCoordinate(duration_dot_text_start_coordinate, duration_min_input_start_coordinate, duration_dot_text_width);
+    //     let duration_sec_input = this.drawInput(duration_input_sec_start_coordinate, this.getMinAndSecString[1]);
+    //     let duration_sec_input_width = duration_sec_input.clientWidth;
+    //     this.setDurationSecInput(duration_sec_input);
 
-        // duration sec input up triangle
-        const duration_sec_input_up_triangle_start_coordinate = this.getDurationSecInputUpTriangleStartCoordinate(duration_input_sec_start_coordinate, duration_sec_input_width);
-        let duration_sec_input_up_triangle = this.drawTriangle(duration_sec_input_up_triangle_start_coordinate, true);
+    //     // duration sec input underbar
+    //     let duration_sec_input_underbar = this.drawInputUnderbar(duration_input_sec_start_coordinate, duration_sec_input_width);
 
-        // duration sec input down triangle
-        const duration_sec_input_down_triangle_start_coordinate = this.getDurationSecInputDownTriangleStartCoordinate(duration_sec_input_up_triangle_start_coordinate);
-        let duration_sec_input_down_triangle = this.drawTriangle(duration_sec_input_down_triangle_start_coordinate, false);
-    }
+    //     // duration sec input up triangle
+    //     const duration_sec_input_up_triangle_start_coordinate = this.getDurationSecInputUpTriangleStartCoordinate(duration_input_sec_start_coordinate, duration_sec_input_width);
+    //     let duration_sec_input_up_triangle = this.drawTriangle(duration_sec_input_up_triangle_start_coordinate, true);
+
+    //     // duration sec input down triangle
+    //     const duration_sec_input_down_triangle_start_coordinate = this.getDurationSecInputDownTriangleStartCoordinate(duration_sec_input_up_triangle_start_coordinate);
+    //     let duration_sec_input_down_triangle = this.drawTriangle(duration_sec_input_down_triangle_start_coordinate, false);
+    // }
 }

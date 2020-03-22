@@ -1,24 +1,24 @@
 // sizes and lengths
-const timer_rect_size = [300, 300];
-const timer_rect_corner_radius = 50;
-const timer_margin = 24;
-const circle_radius = 25;
-const distance_circle_rect_round = 10;
-const dif_circle_center_and_rect_corner = timer_rect_corner_radius - (timer_rect_corner_radius - circle_radius - distance_circle_rect_round) * Math.sin(45 * Math.PI / 180);
-const single_timer_width = timer_rect_size[0] + timer_margin;
+const TimerRectSize = [300, 300];
+const TimerRectCornerRadius = 50;
+const TimerMargin = 24;
+const CircleRadius = 25;
+const DistanceCircleRectRound = 10;
+const DifCircleCenterAndRectCorner = TimerRectCornerRadius - (TimerRectCornerRadius - CircleRadius - DistanceCircleRectRound) * Math.sin(45 * Math.PI / 180);
+const SingleTimerWidth = TimerRectSize[0] + TimerMargin;
 // position coordinates
-const first_layer_start_coordinate = [timer_margin * 2, 50];
+const FirstLayerStartCoordinate = [TimerMargin * 2, 50];
 // timings
-const pushed_scale_interval = 5;
+const PushedScaleInterval = 5;
 // others
-const timer_rect_zIndex = 0;
-const circle_zIndex = 1;
+const TimerRectZIndex = 0;
+const CircleZIndex = 1;
 
-let div_timer_stage = document.getElementById('timer_stage');
+let timerStageDiv = document.getElementById('timer_stage');
 
 function renewDivTimerStageWidth() {
-    let div_width = first_layer_start_coordinate[0] + (single_timer_width * timer_num) + (circle_radius - (timer_margin / 2));
-    div_timer_stage.style.width = div_width + "px";
+    let div_width = FirstLayerStartCoordinate[0] + (SingleTimerWidth * timer_num) + (CircleRadius - (TimerMargin / 2));
+    timerStageDiv.style.width = div_width + "px";
 }
 
 let timer_stage = acgraph.create('timer_stage');
@@ -33,42 +33,59 @@ let next_new_timer_id = 1;
 
 // let new_timer_requested = false;
 
+class TimerSet {
+
+    constructor() {
+        this.TimerList = [];
+    }
+
+    addTimer(newSingleTimer) {
+        if (this.TimerList.length == 0) {
+            this.TimerList.push(newSingleTimer)
+        } else {
+            // 左端と右端のタイマーをプログラムだけで使える架空タイマーにしておく？
+            // idだけだと端のタイマーが変わった時セット忘れそう
+            // この方法だと端にタイマーを追加するときも手続きを同じにできそう
+        }
+    }
+}
+
 class SingleTimer {
 
     constructor(timer_id, left_timer_id, right_timer_id, group_start_coordinate) {
-        this.timer_id = timer_id;
-        this.left_timer_id = left_timer_id;
-        this.right_timer_id = right_timer_id;
-        this.group_start_coordinate = group_start_coordinate;
-        this.timer_layer;
-        this.timer_content = new TimerContent(this);
+        this.timerId = timer_id;
+        this.leftTimerId = left_timer_id;
+        this.rightTimerId = right_timer_id;
+        this.startCoordinate = group_start_coordinate;
+        this.timerLayer;
+        this.timerContent = new TimerContent(this);
     }
 
-    get getId() {
-        return this.timer_id;
-    }
+    // get timerId() {
+    //     return this.timerId;
+    // }
 
-    get getLeftId() {
-        return this.left_timer_id;
-    }
+    // get leftTimerId() {
+    //     return this.leftTimerId;
+    // }
 
-    get getRightId() {
-        return this.right_timer_id;
-    }
+    // get rightTimerId() {
+    //     return this.rightTimerId;
+    // }
 
-    get getCoordinate() {
-        return this.group_start_coordinate;
-    }
+    // get startCoordinate() {
+    //     return this.startCoordinate;
+    // }
 
-    get getTimerLayer() {
-        return this.timer_layer;
-    }
+    // get timerLayer() {
+    //     return this.timerLayer;
+    // }
 
-    get getMinAndSec() {
+    getMinAndSec() {
         return [this.timer_duration / 60, this.timer_duration % 60];
     }
 
-    get getTimerDurationString() {
+    getTimerDurationString() {
         let min_and_sec_set = this.getMinAndSec;
         let min = min_and_sec_set[0];
         let sec = min_and_sec_set[1]
@@ -77,18 +94,22 @@ class SingleTimer {
         return min_string + ':' + sec_string;
     }
 
-    setRightId(new_right_id) {
-        this.right_timer_id = new_right_id;
-    }
+    // set timerId(timer_id) {
+    //     this.timerId = timer_id;
+    // }
 
-    setLeftId(new_left_id) {
-        this.left_timer_id = new_left_id;
-    }
+    // set rightTimerId(new_right_id) {
+    //     this.rightTimerId = new_right_id;
+    // }
 
-    setGroupStartCoordinate(new_coordinate) {
-        this.group_start_coordinate = new_coordinate;
-        this.timer_layer.setPosition(new_coordinate[0], new_coordinate[1]);
-        this.timer_content.setContentLayerCoordinate();
+    // set leftTimerId(new_left_id) {
+    //     this.leftTimerId = new_left_id;
+    // }
+
+    setStartCoordinate(new_coordinate) {
+        this.startCoordinate = new_coordinate;
+        this.timerLayer.setPosition(new_coordinate[0], new_coordinate[1]);
+        this.timerContent.setContentLayerCoordinate();
     }
 
     static setEveryTimerZIndex() {
@@ -96,7 +117,7 @@ class SingleTimer {
         let thisTimer = SingleTimer.getMostRightTimer();
         let isFinished = false;
         while (!isFinished) {
-            thisTimer.getTimerLayer.zIndex(zIndex);
+            thisTimer.timerLayer.zIndex(zIndex);
             zIndex += 1;
 
             if (thisTimer.getLeftId == 0) {
@@ -147,9 +168,9 @@ class SingleTimer {
         if (start_timer != -1) {
 
             if (bool_move_to_right) {
-                start_timer.setGroupStartCoordinate([start_timer.getCoordinate[0] + single_timer_width, start_timer.getCoordinate[1]]);
+                start_timer.setGroupStartCoordinate([start_timer.getCoordinate[0] + SingleTimerWidth, start_timer.getCoordinate[1]]);
             } else {
-                start_timer.setGroupStartCoordinate([start_timer.getCoordinate[0] - single_timer_width, start_timer.getCoordinate[1]]);
+                start_timer.setGroupStartCoordinate([start_timer.getCoordinate[0] - SingleTimerWidth, start_timer.getCoordinate[1]]);
             }
 
             if (start_timer.getRightId != 0) {
@@ -180,42 +201,42 @@ class SingleTimer {
 
     static getNewLayerCoordinate(left_timer_id) {
         let left_timer_num = SingleTimer.countLeftTimer(left_timer_id);
-        let x = first_layer_start_coordinate[0] + (timer_rect_size[0] + timer_margin) * left_timer_num;
-        let y = first_layer_start_coordinate[1];
+        let x = FirstLayerStartCoordinate[0] + (TimerRectSize[0] + TimerMargin) * left_timer_num;
+        let y = FirstLayerStartCoordinate[1];
         return [x, y];
     }
 
     circlePushedAnimation(single_circle, callback) {
 
-        let present_radius = circle_radius;
+        let present_radius = CircleRadius;
         let deflated = false;
         let inflated = false;
 
         function animateCircle(animation_timer, callback) {
-            if (present_radius > circle_radius * 0.9 && !deflated) {
+            if (present_radius > CircleRadius * 0.9 && !deflated) {
                 present_radius -= 0.2;
                 single_circle.setRadius(present_radius, present_radius);
-            } else if (present_radius < circle_radius && !inflated) {
+            } else if (present_radius < CircleRadius && !inflated) {
                 if (!deflated) {
                     deflated = true;
                 }
                 present_radius += 0.2;
                 single_circle.setRadius(present_radius, present_radius);
-            } else if (deflated && present_radius >= circle_radius && !inflated) {
+            } else if (deflated && present_radius >= CircleRadius && !inflated) {
                 inflated = true;
                 clearInterval(animation_timer);
 
                 callback();
             }
         }
-        let animation_timer = setInterval(animateCircle, pushed_scale_interval, animation_timer, callback);
+        let animation_timer = setInterval(animateCircle, PushedScaleInterval, animation_timer, callback);
     }
 
     drawCircle(center_coordinate, layer) {
-        let single_circle = acgraph.circle(center_coordinate[0], center_coordinate[1], circle_radius);
+        let single_circle = acgraph.circle(center_coordinate[0], center_coordinate[1], CircleRadius);
         single_circle.fill(color_light_blue);
         single_circle.stroke(0);
-        single_circle.zIndex(circle_zIndex);
+        single_circle.zIndex(CircleZIndex);
         layer.addChild(single_circle);
 
         return single_circle;
@@ -241,11 +262,11 @@ class SingleTimer {
     }
 
     centerize_text_x(text) {
-        text.setPosition(this.group_start_coordinate[0] + (timer_rect_size[0] - text.getWidth()) / 2, text.getAbsoluteY());
+        text.setPosition(this.startCoordinate[0] + (TimerRectSize[0] - text.getWidth()) / 2, text.getAbsoluteY());
     }
 
     centerize_text_y(text) {
-        text.setPosition(text.getAbsoluteX(), this.group_start_coordinate[1] + (timer_rect_size[1] - text.getHeight()) / 2);
+        text.setPosition(text.getAbsoluteX(), this.startCoordinate[1] + (TimerRectSize[1] - text.getHeight()) / 2);
     }
 
     delete_timer(deleting_timer_id) {
@@ -280,32 +301,32 @@ class SingleTimer {
 
     setAsButton(button) {
         button.listen('mouseover', function () {
-            div_timer_stage.style.cursor = "pointer";
+            timerStageDiv.style.cursor = "pointer";
         });
         button.listen('mouseout', function () {
-            div_timer_stage.style.cursor = "default";
+            timerStageDiv.style.cursor = "default";
         });
     }
 
     drawTimer() {
 
-        let this_timer_id = this.timer_id;
+        let this_timer_id = this.timerId;
 
         let timer_layer = timer_stage.layer();
-        let group_rect = new acgraph.math.Rect(this.group_start_coordinate[0], this.group_start_coordinate[1], timer_rect_size[0] + circle_radius * 2, timer_rect_size[1]);
+        let group_rect = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0] + CircleRadius * 2, TimerRectSize[1]);
         timer_layer.clip(group_rect);
 
-        this.timer_layer = timer_layer;
+        this.timerLayer = timer_layer;
 
-        let timer_rect_base = new acgraph.math.Rect(this.group_start_coordinate[0], this.group_start_coordinate[1], timer_rect_size[0], timer_rect_size[1]);
-        let timer_rect = acgraph.vector.primitives.roundedRect(timer_stage, timer_rect_base, timer_rect_corner_radius);
+        let timer_rect_base = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
+        let timer_rect = acgraph.vector.primitives.roundedRect(timer_stage, timer_rect_base, TimerRectCornerRadius);
         timer_rect.fill(color_light_green);
         timer_rect.stroke(0);
-        timer_rect.zIndex(timer_rect_zIndex);
+        timer_rect.zIndex(TimerRectZIndex);
         timer_layer.addChild(timer_rect);
 
         if (timer_num == 0) {
-            let left_plus_button = this.drawCircle([this.group_start_coordinate[0] - timer_margin / 2, this.group_start_coordinate[1] + timer_rect_size[1] / 2], left_plus_button_layer);
+            let left_plus_button = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], left_plus_button_layer);
 
             left_plus_button.listen('click', function () {
 
@@ -325,7 +346,7 @@ class SingleTimer {
             this.setAsButton(left_plus_button)
         }
 
-        let cancel_button = this.drawCircle([this.group_start_coordinate[0] + timer_rect_size[0] - dif_circle_center_and_rect_corner, this.group_start_coordinate[1] + dif_circle_center_and_rect_corner], timer_layer);
+        let cancel_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + DifCircleCenterAndRectCorner], timer_layer);
         cancel_button.listen('click', function (e) {
 
             let this_timer = SingleTimer.getTimerById(this_timer_id);
@@ -343,7 +364,7 @@ class SingleTimer {
         });
         this.setAsButton(cancel_button);
 
-        let right_plus_button = this.drawCircle([this.group_start_coordinate[0] + timer_rect_size[0] + timer_margin / 2, this.group_start_coordinate[1] + timer_rect_size[1] / 2], timer_layer);
+        let right_plus_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] + TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], timer_layer);
         right_plus_button.listen('click', function () {
 
             let this_timer = SingleTimer.getTimerById(this_timer_id);
@@ -370,15 +391,15 @@ class SingleTimer {
         });
         this.setAsButton(right_plus_button);
 
-        let right_bottom_button = this.drawCircle([this.group_start_coordinate[0] + timer_rect_size[0] - dif_circle_center_and_rect_corner, this.group_start_coordinate[1] + timer_rect_size[1] - dif_circle_center_and_rect_corner], timer_layer);
+        let right_bottom_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + TimerRectSize[1] - DifCircleCenterAndRectCorner], timer_layer);
         right_bottom_button.listen('click', function (e) {
             let this_timer = SingleTimer.getTimerById(this_timer_id);
             this_timer.circlePushedAnimation(right_bottom_button, function () { });
         });
         this.setAsButton(right_bottom_button);
 
-        this.timer_content.drawContent();
-        this.timer_content.getContentLayer.parent(timer_layer);
+        // this.timerContent.drawContent();
+        this.timerContent.contentLayer.parent(timer_layer);
 
         timer_num++;
 
