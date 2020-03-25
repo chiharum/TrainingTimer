@@ -166,6 +166,8 @@ class SingleInputAndButton {
         this.singleInput = new SingleInput(this.inputTextStr, this.getSingleInputTopCenterCoordinate);
 
         this.upDownButtonLayer = acgraph.layer();
+        const layerRect = new acgraph.rect(this.topCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.topCenterCoordinate[1], UpDownTriangleLineLen, UpDownTriangleHeight * 2 + ButtonInputMargin * 2 + InputFontSize);
+        this.upDownButtonLayer.clip(layerRect);
     }
 
     // get upDownButtonLayer() {
@@ -200,8 +202,10 @@ class SingleInputAndButton {
         return Math.max(this.getInputTextWidth, UpDownTriangleLineLen);
     }
 
-    setStartPosition(x, y) {
-        // TBD
+    setTopCenterCoordinate(newTopCenterCoordinate) {
+        this.topCenterCoordinate = newTopCenterCoordinate;
+
+        this.upDownButtonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
     }
 
     getSingleInputTopCenterCoordinate() {
@@ -306,11 +310,10 @@ class TimerContent {
     }
     // 以上二つ不要
 
-    moveAllContent(x, y) {
-        let content_layer = this.contentLayer;
-        content_layer.setPosition(x, y);
+    setContentCoordinate(newCoordinate) {
+        this.contentLayer.setPosition(newCoordinate[0], newCoordinate[1]);
 
-        // TBD
+        this.repeatInput.setTopCenterCoordinate(newCoordinate[0], newCoordinate[1]);
     }
 
     getPresentRepeatInputCoordinate() {

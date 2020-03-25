@@ -13,21 +13,11 @@ const PushedScaleInterval = 5;
 // others
 const TimerRectZIndex = 0;
 const CircleZIndex = 1;
+const firstTimerId = 0;
+const MostLeftTimerLeftId = firstTimerId - 1;
 
-let timerStageDiv = document.getElementById('timer_stage');
-
-let timer_stage = acgraph.create('timer_stage');
-
-let left_plus_button_layer = timer_stage.layer();
-
-let userTimerList = new TimerSet();
-
-let timerNum = 0;
-
-let next_new_timer_id = 1;
-
-function renewDivTimerStageWidth() {
-    let div_width = FirstLayerStartCoordinate[0] + (SingleTimerWidth * timerNum) + (CircleRadius - (TimerMargin / 2));
+function renewTimerStageDivWidth() {
+    let div_width = FirstLayerStartCoordinate[0] + (SingleTimerWidth * userTimerList.timerList.length) + (CircleRadius - (TimerMargin / 2));
     timerStageDiv.style.width = div_width + "px";
 }
 
@@ -62,28 +52,59 @@ class TimerSet {
         return this.timerList[index];
     }
 
-    addTimer(newSingleTimer, isNewTimerTop, leftTimer) {
-        if (this.timerList.length == 0) {
-            this.timerList.push(newSingleTimer)
+    getNewTimerStartCoordinate(leftTimerId) {
+        let leftTimerNum = this.getIndexFromId(leftTimerId);
+        let x = FirstLayerStartCoordinate[0] + (TimerRectSize[0] + TimerMargin) * leftTimerNum;
+        let y = FirstLayerStartCoordinate[1];
+        return [x, y];
+    }
+
+    setEveryTimerZIndex() {
+        let zIndex = 0;
+
+        for (let i = 0; i < this.timerList.length; ++i) {
+            this.timerList[i].zIndex(zIndex).timerLayer.zIndex(zIndex);
+            zIndex += 1;
+        }
+    }
+
+    setEveryTimerPosition() {
+        let nextCoordinate = FirstLayerStartCoordinate;
+
+        for (let index = 0; index < this.timerList.length; ++index) {
+            let movingTimer = userTimerList.timerList[index];
+
+            movingTimer.setStartCoordinate([nextCoordinate[0], nextCoordinate[1]]);
+
+            nextCoordinate = [nextCoordinate[0] + SingleTimerWidth, nextCoordinate[1]];
+        }
+    }
+
+    createNewTimer(leftTimerId) {
+        let newSingleTimer;
+
+        if (leftTimerId == MostLeftTimerLeftId) {
+            newSingleTimer = new SingleTimer(nextNewTimerId, FirstLayerStartCoordinate);
+
+            this.timerList.unshift(newSingleTimer);
         } else {
-            if (isNewTimerTop) {
-                this.timerList.unshift(newSingleTimer);
-            } else {
-                let isIdValid = true;
-                let index;
+            newSingleTimer = new SingleTimer(nextNewTimerId, this.getNewTimerStartCoordinate(leftTimerId));
 
-                try {
-                    index = this.getIndexFromId(leftTimer.timerId);
-                } catch{
-                    isIdValid = false;
-                    console.log(e.name + ": " + e.message);
-                }
+            try {
+                let index = this.getIndexFromId(leftTimerId);
 
-                if (isIdValid) {
-                    this.timerList.splice(index, 0, newSingleTimer);
-                }
+                this.timerList.splice(index, 0, newSingleTimer);
+            } catch{
+                console.log(e.name + ": " + e.message);
             }
         }
+
+        ++nextNewTimerId;
+
+        this.setEveryTimerPosition();
+        this.setEveryTimerZIndex();
+
+        return newSingleTimer;
     }
 
     eraseTimer(erasingTimerId) {
@@ -101,32 +122,6 @@ class TimerSet {
             this.timerList.splice(index, 1);
         }
     }
-
-    setEveryTimerZIndex() {
-        let zIndex = 0;
-
-        for (let i = 0; i < this.timerList.length; ++i) {
-            this.timerList[i].zIndex(zIndex).timerLayer.zIndex(zIndex);
-            zIndex += 1;
-        }
-    }
-
-    moveEveryRightTimerPosition(startTimerId, moveToRight) {
-        try {
-            let startTimerIndex = this.getIndexFromId(startTimerId);
-
-            for (let index = startTimerIndex; index < this.timerList.length; ++index) {
-                let movingTimer = userTimerList.timerList[index];
-                if (moveToRight) {
-                    movingTimer.setGroupStartCoordinate([movingTimer.getCoordinate[0] + SingleTimerWidth, movingTimer.getCoordinate[1]]);
-                } else {
-                    movingTimer.setGroupStartCoordinate([movingTimer.getCoordinate[0] - SingleTimerWidth, movingTimer.getCoordinate[1]]);
-                }
-            }
-        } catch (e) {
-            console.log(e.name + ": " + e.message);
-        }
-    }
 }
 
 class SingleTimer {
@@ -134,8 +129,8 @@ class SingleTimer {
     constructor(timer_id, group_start_coordinate) {
         this.timerId = timer_id;
         this.startCoordinate = group_start_coordinate;
-        
-        this.timerLayer = timer_stage.layer();
+
+        this.timerLayer = timerStage.layer();
         this.timerContent = new TimerContent(this);
     }
 
@@ -174,23 +169,7 @@ class SingleTimer {
     setStartCoordinate(new_coordinate) {
         this.startCoordinate = new_coordinate;
         this.timerLayer.setPosition(new_coordinate[0], new_coordinate[1]);
-        this.timerContent.setContentLayerCoordinate();
-    }
-
-    static countLeftTimer(left_timer_id) {
-        for (let i = 0; i < userTimerList.timerList.length; i++) {
-            if (userTimerList.timerList[i].getId == left_timer_id) {
-                return 1 + SingleTimer.countLeftTimer(userTimerList.timerList[i].getLeftId);
-            }
-        }
-        return 0;
-    }
-
-    static getNewLayerCoordinate(left_timer_id) {
-        let left_timer_num = SingleTimer.countLeftTimer(left_timer_id);
-        let x = FirstLayerStartCoordinate[0] + (TimerRectSize[0] + TimerMargin) * left_timer_num;
-        let y = FirstLayerStartCoordinate[1];
-        return [x, y];
+        this.timerContent.setContentCoordinate();
     }
 
     circlePushedAnimation(single_circle, callback) {
@@ -229,63 +208,6 @@ class SingleTimer {
         return single_circle;
     }
 
-    static createNewTimer(left_timer_id, right_timer_id) {
-        let new_timer = new SingleTimer(next_new_timer_id, left_timer_id, right_timer_id, SingleTimer.getNewLayerCoordinate(left_timer_id));
-        new_timer.drawTimer();
-        userTimerList.timerList.push(new_timer);
-
-        return new_timer;
-    }
-
-    createNextTimer(left_timer_id, right_timer_id) {
-
-        const new_timer = SingleTimer.createNewTimer(left_timer_id, right_timer_id);
-
-        if (right_timer_id != 0) {
-            userTimerList.moveEveryRightTimerPosition(right_timer_id, true);
-        }
-
-        return new_timer;
-    }
-
-    centerize_text_x(text) {
-        text.setPosition(this.startCoordinate[0] + (TimerRectSize[0] - text.getWidth()) / 2, text.getAbsoluteY());
-    }
-
-    centerize_text_y(text) {
-        text.setPosition(text.getAbsoluteX(), this.startCoordinate[1] + (TimerRectSize[1] - text.getHeight()) / 2);
-    }
-
-    delete_timer(deleting_timer_id) {
-
-        if (timerNum > 1) {
-            const deleting_timer = userTimerList.getTimerById(deleting_timer_id);
-            const left_timer_id = deleting_timer.getLeftId;
-            const right_timer_id = deleting_timer.getRightId;
-
-            if (left_timer_id != 0) {
-                userTimerList.getTimerById(left_timer_id).setRightId(right_timer_id);
-            }
-            if (right_timer_id != 0) {
-                userTimerList.getTimerById(right_timer_id).setLeftId(left_timer_id);
-            }
-
-            deleting_timer.getTimerLayer.remove();
-
-            for (let i = 0; i < userTimerList.timerList.length; i++) {
-                if (userTimerList.timerList[i].getId == deleting_timer_id) {
-                    userTimerList.timerList.splice(i, 1);
-                }
-            }
-
-            timerNum--;
-
-            renewDivTimerStageWidth();
-
-            userTimerList.moveEveryRightTimerPosition(userTimerList.getTimerById(right_timer_id).getId, false);
-        }
-    }
-
     setAsButton(button) {
         button.listen('mouseover', function () {
             timerStageDiv.style.cursor = "pointer";
@@ -303,28 +225,28 @@ class SingleTimer {
         timer_layer.clip(group_rect);
 
         let timer_rect_base = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
-        let timer_rect = acgraph.vector.primitives.roundedRect(timer_stage, timer_rect_base, TimerRectCornerRadius);
+        let timer_rect = acgraph.vector.primitives.roundedRect(timerStage, timer_rect_base, TimerRectCornerRadius);
         timer_rect.fill(color_light_green);
         timer_rect.stroke(0);
         timer_rect.zIndex(TimerRectZIndex);
         timer_layer.addChild(timer_rect);
 
-        if (timerNum == 0) {
-            let left_plus_button = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], left_plus_button_layer);
+        if (userTimerList.timerList.length == 0) {
+            let left_plus_button = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], leftPlusButtonLayer);
 
             left_plus_button.listen('click', function () {
 
                 let this_timer = userTimerList.timerList[0];
 
                 this_timer.circlePushedAnimation(left_plus_button, function () {
-                    timer_stage.suspend();
+                    timerStage.suspend();
 
                     let new_timer = this_timer.createNextTimer(0, this_timer.getId);
                     this_timer.setLeftId(new_timer.getId);
 
                     userTimerList.setEveryTimerZIndex();
 
-                    timer_stage.resume();
+                    timerStage.resume();
                 });
             });
             this.setAsButton(left_plus_button)
@@ -337,13 +259,13 @@ class SingleTimer {
 
             this_timer.circlePushedAnimation(cancel_button, function () {
 
-                timer_stage.suspend();
+                timerStage.suspend();
 
                 this_timer.delete_timer(this_timer_id);
 
                 userTimerList.setEveryTimerZIndex();
 
-                timer_stage.resume();
+                timerStage.resume();
             });
         });
         this.setAsButton(cancel_button);
@@ -357,7 +279,7 @@ class SingleTimer {
 
             this_timer.circlePushedAnimation(right_plus_button, function () {
 
-                timer_stage.suspend();
+                timerStage.suspend();
 
                 let original_right_timer_id = this_timer.getRightId;
 
@@ -370,7 +292,7 @@ class SingleTimer {
 
                 userTimerList.setEveryTimerZIndex();
 
-                timer_stage.resume();
+                timerStage.resume();
             });
         });
         this.setAsButton(right_plus_button);
@@ -382,18 +304,18 @@ class SingleTimer {
         });
         this.setAsButton(right_bottom_button);
 
-        // this.timerContent.drawContent();
         this.timerContent.contentLayer.parent(timer_layer);
 
-        timerNum++;
-
-        renewDivTimerStageWidth();
-
-        next_new_timer_id++;
+        renewTimerStageDivWidth();
     }
 }
 
-timer_stage.suspend();
-let timer = SingleTimer.createNewTimer(0, 0);
-userTimerList.setEveryTimerZIndex();
-timer_stage.resume();
+let timerStageDiv = document.getElementById('timer_stage');
+let timerStage = acgraph.create('timer_stage');
+let leftPlusButtonLayer = timerStage.layer();
+let userTimerList = new TimerSet();
+let nextNewTimerId = 1;
+
+timerStage.suspend();
+userTimerList.createNewTimer(MostLeftTimerLeftId);
+timerStage.resume();
