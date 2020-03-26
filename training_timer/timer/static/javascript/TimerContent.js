@@ -54,13 +54,13 @@ function animatePathObject(path_object, callback) {
 
 class SingleInput {
 
-    constructor(value_in_str, top_center_coordinate) {
+    constructor(valueStr, topCenterCoordinate) {
         this.singleInputLayer = acgraph.layer();
-        this.valueInStr = value_in_str;
+        this.valueInStr = valueStr;
 
         this.input = this.drawNewInput(this.valueInStr);
 
-        this.topCenterCoordinate = top_center_coordinate;
+        this.topCenterCoordinate = topCenterCoordinate;
         this.startCoordinate = this.getStartCoordinate();
 
         this.underbar = this.drawNewInputUnderbar(this.startCoordinate, this.input.clientWidth);
@@ -94,13 +94,13 @@ class SingleInput {
     //     this.startCoordinate = new_start_coordinate;
     // }
 
-    setValueInStr(new_val_str) {
-        this.setInputStyle(this.input, this.getStartCoordinate(), new_val_str);
-        this.valueInStr = new_val_str;
+    setValueInStr(newValueStr) {
+        this.setInputStyle(this.input, this.getStartCoordinate(), newValueStr);
+        this.valueInStr = newValueStr;
     }
 
-    setTopCenterCoordinate(new_top_center_coordinate) {
-        this.topCenterCoordinate = new_top_center_coordinate;
+    setTopCenterCoordinate(newTopCenterCoordinate) {
+        this.topCenterCoordinate = newTopCenterCoordinate;
         this.startCoordinate = this.getStartCoordinate();
         this.setInputStyle(this.input, this.startCoordinate, this.valueInStr);
 
@@ -206,6 +206,7 @@ class SingleInputAndButton {
         this.topCenterCoordinate = newTopCenterCoordinate;
 
         this.upDownButtonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
+        this.singleInput.setTopCenterCoordinate(newTopCenterCoordinate);
     }
 
     getSingleInputTopCenterCoordinate() {
@@ -263,7 +264,7 @@ class TimerContent {
         this.repeatInput = new SingleInputAndButton(this.repeatNum, false, this.getPresentRepeatInputCoordinate);
 
         // minとsec一緒にしたclassつくるか
-        this.durationMinInput = new SingleInputAndButton();
+        this.durationMinInput;
         this.durationSecInput;
     }
 
@@ -310,10 +311,10 @@ class TimerContent {
     }
     // 以上二つ不要
 
-    setContentCoordinate(newCoordinate) {
-        this.contentLayer.setPosition(newCoordinate[0], newCoordinate[1]);
+    resetContentCoordinate() {
+        this.contentLayer.setPosition(this.parentTimer.startCoordinate[0], this.parentTimer.startCoordinate[1]);
 
-        this.repeatInput.setTopCenterCoordinate(newCoordinate[0], newCoordinate[1]);
+        this.repeatInput.setTopCenterCoordinate(this.parentTimer.startCoordinate[0] + (TimerRectSize[0] / 2), this.parentTimer.startCoordinate[1]);
     }
 
     getPresentRepeatInputCoordinate() {

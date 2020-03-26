@@ -16,9 +16,16 @@ const CircleZIndex = 1;
 const firstTimerId = 0;
 const MostLeftTimerLeftId = firstTimerId - 1;
 
+let timerStageDiv = document.getElementById('timer_stage');
+let timerStage = acgraph.create('timer_stage');
+let leftPlusButtonLayer = timerStage.layer();
+let nextNewTimerId = 1;
+
 function renewTimerStageDivWidth() {
-    let div_width = FirstLayerStartCoordinate[0] + (SingleTimerWidth * userTimerList.timerList.length) + (CircleRadius - (TimerMargin / 2));
-    timerStageDiv.style.width = div_width + "px";
+    let divWidth = FirstLayerStartCoordinate[0] + (SingleTimerWidth * userTimerList.timerList.length) + (CircleRadius - (TimerMargin / 2));
+    timerStageDiv.style.width = divWidth.toString() + "px";
+
+    console.log(userTimerList.timerList.length);
 }
 
 class TimerSet {
@@ -63,7 +70,7 @@ class TimerSet {
         let zIndex = 0;
 
         for (let i = 0; i < this.timerList.length; ++i) {
-            this.timerList[i].zIndex(zIndex).timerLayer.zIndex(zIndex);
+            this.timerList[i].timerLayer.zIndex(zIndex);
             zIndex += 1;
         }
     }
@@ -101,6 +108,7 @@ class TimerSet {
 
         ++nextNewTimerId;
 
+        renewTimerStageDivWidth();
         this.setEveryTimerPosition();
         this.setEveryTimerZIndex();
 
@@ -121,8 +129,31 @@ class TimerSet {
         if (isIdValid) {
             this.timerList.splice(index, 1);
         }
+
+        this.setEveryTimerPosition();
+        this.timerList.setEveryTimerZIndex();
+    }
+
+    getLeftTimerId(timerId) {
+        try {
+            let thisTimerIndex = this.getIndexFromId(timerId);
+
+            if (thisTimerIndex == 0) {
+                return MostLeftTimerLeftId;
+            } else {
+                return this.timerList[i - 1].timerId;
+            }
+        } catch (e) {
+            console.log(e.name + ": " + e.message);
+        }
+    }
+
+    createFirstTimer() {
+        this.createNewTimer(MostLeftTimerLeftId);
     }
 }
+
+let userTimerList = new TimerSet();
 
 class SingleTimer {
 
@@ -131,6 +162,8 @@ class SingleTimer {
         this.startCoordinate = group_start_coordinate;
 
         this.timerLayer = timerStage.layer();
+        this.drawTimer();
+
         this.timerContent = new TimerContent(this);
     }
 
@@ -169,7 +202,7 @@ class SingleTimer {
     setStartCoordinate(new_coordinate) {
         this.startCoordinate = new_coordinate;
         this.timerLayer.setPosition(new_coordinate[0], new_coordinate[1]);
-        this.timerContent.setContentCoordinate();
+        this.timerContent.resetContentCoordinate();
     }
 
     circlePushedAnimation(single_circle, callback) {
@@ -178,7 +211,7 @@ class SingleTimer {
         let deflated = false;
         let inflated = false;
 
-        function animateCircle(animation_timer, callback) {
+        function animateCircle(animationTimer, callback) {
             if (present_radius > CircleRadius * 0.9 && !deflated) {
                 present_radius -= 0.2;
                 single_circle.setRadius(present_radius, present_radius);
@@ -190,12 +223,12 @@ class SingleTimer {
                 single_circle.setRadius(present_radius, present_radius);
             } else if (deflated && present_radius >= CircleRadius && !inflated) {
                 inflated = true;
-                clearInterval(animation_timer);
+                clearInterval(animationTimer);
 
                 callback();
             }
         }
-        let animation_timer = setInterval(animateCircle, PushedScaleInterval, animation_timer, callback);
+        let animationTimer = setInterval(animateCircle, PushedScaleInterval, animationTimer, callback);
     }
 
     drawCircle(center_coordinate, layer) {
@@ -218,104 +251,69 @@ class SingleTimer {
     }
 
     drawTimer() {
+        let thisTimerId = this.timerId;
 
-        let this_timer_id = this.timerId;
+        let groupRect = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0] + CircleRadius * 2, TimerRectSize[1]);
+        this.timerLayer.clip(groupRect);
 
-        let group_rect = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0] + CircleRadius * 2, TimerRectSize[1]);
-        timer_layer.clip(group_rect);
-
-        let timer_rect_base = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
-        let timer_rect = acgraph.vector.primitives.roundedRect(timerStage, timer_rect_base, TimerRectCornerRadius);
-        timer_rect.fill(color_light_green);
-        timer_rect.stroke(0);
-        timer_rect.zIndex(TimerRectZIndex);
-        timer_layer.addChild(timer_rect);
+        const timerRectBaseRect = new acgraph.math.Rect(this.startCoordinate[0], this.startCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
+        let timerRect = acgraph.vector.primitives.roundedRect(timerStage, timerRectBaseRect, TimerRectCornerRadius);
+        timerRect.fill(color_light_green);
+        timerRect.stroke(0);
+        timerRect.zIndex(TimerRectZIndex);
+        this.timerLayer.addChild(timerRect);
 
         if (userTimerList.timerList.length == 0) {
-            let left_plus_button = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], leftPlusButtonLayer);
+            let leftPlusButton = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], leftPlusButtonLayer);
 
-            left_plus_button.listen('click', function () {
-
-                let this_timer = userTimerList.timerList[0];
-
-                this_timer.circlePushedAnimation(left_plus_button, function () {
+            leftPlusButton.listen('click', function () {
+                userTimerList.timerList[0].circlePushedAnimation(leftPlusButton, function () {
                     timerStage.suspend();
 
-                    let new_timer = this_timer.createNextTimer(0, this_timer.getId);
-                    this_timer.setLeftId(new_timer.getId);
-
-                    userTimerList.setEveryTimerZIndex();
+                    userTimerList.createNewTimer(MostLeftTimerLeftId);
 
                     timerStage.resume();
                 });
             });
-            this.setAsButton(left_plus_button)
+            this.setAsButton(leftPlusButton)
         }
 
-        let cancel_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + DifCircleCenterAndRectCorner], timer_layer);
-        cancel_button.listen('click', function (e) {
-
-            let this_timer = userTimerList.getTimerById(this_timer_id);
-
-            this_timer.circlePushedAnimation(cancel_button, function () {
+        let cancelButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + DifCircleCenterAndRectCorner], this.timerLayer);
+        cancelButton.listen('click', function (e) {
+            userTimerList.getTimerById(thisTimerId).circlePushedAnimation(cancelButton, function () {
 
                 timerStage.suspend();
 
-                this_timer.delete_timer(this_timer_id);
-
-                userTimerList.setEveryTimerZIndex();
+                userTimerList.eraseTimer(thisTimerId);
 
                 timerStage.resume();
             });
         });
-        this.setAsButton(cancel_button);
+        this.setAsButton(cancelButton);
 
-        let right_plus_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] + TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], timer_layer);
-        right_plus_button.listen('click', function () {
+        let rightPlusButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] + TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], this.timerLayer);
+        rightPlusButton.listen('click', function () {
 
-            let this_timer = userTimerList.getTimerById(this_timer_id);
+            let thisTimer = userTimerList.getTimerById(thisTimerId);
 
-            console.log("test!");
-
-            this_timer.circlePushedAnimation(right_plus_button, function () {
+            thisTimer.circlePushedAnimation(rightPlusButton, function () {
 
                 timerStage.suspend();
 
-                let original_right_timer_id = this_timer.getRightId;
-
-                let new_timer = this_timer.createNextTimer(this_timer_id, this_timer.getRightId);
-
-                this_timer.setRightId(new_timer.getId);
-                if (original_right_timer_id != 0) {
-                    userTimerList.getTimerById(original_right_timer_id).setLeftId(new_timer.getId);
-                }
-
-                userTimerList.setEveryTimerZIndex();
+                userTimerList.createNewTimer(thisTimerId);
 
                 timerStage.resume();
             });
         });
-        this.setAsButton(right_plus_button);
+        this.setAsButton(rightPlusButton);
 
-        let right_bottom_button = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + TimerRectSize[1] - DifCircleCenterAndRectCorner], timer_layer);
-        right_bottom_button.listen('click', function (e) {
-            let this_timer = userTimerList.getTimerById(this_timer_id);
-            this_timer.circlePushedAnimation(right_bottom_button, function () { });
+        let rightBottomButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + TimerRectSize[1] - DifCircleCenterAndRectCorner], this.timerLayer);
+        rightBottomButton.listen('click', function (e) {
+            let thisTimer = userTimerList.getTimerById(thisTimerId);
+            thisTimer.circlePushedAnimation(rightBottomButton, function () { });
         });
-        this.setAsButton(right_bottom_button);
-
-        this.timerContent.contentLayer.parent(timer_layer);
-
-        renewTimerStageDivWidth();
+        this.setAsButton(rightBottomButton);
     }
 }
 
-let timerStageDiv = document.getElementById('timer_stage');
-let timerStage = acgraph.create('timer_stage');
-let leftPlusButtonLayer = timerStage.layer();
-let userTimerList = new TimerSet();
-let nextNewTimerId = 1;
-
-timerStage.suspend();
-userTimerList.createNewTimer(MostLeftTimerLeftId);
-timerStage.resume();
+userTimerList.createFirstTimer();
