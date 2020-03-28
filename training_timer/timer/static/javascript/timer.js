@@ -87,15 +87,14 @@ class SingleInput {
     constructor(valueStr, topCenterCoordinate) {
         this.valueInStr = valueStr;
 
-        this.input = this.drawNewInput(this.valueInStr);
-
         this.topCenterCoordinate = topCenterCoordinate;
+
+        this.input = this.drawNewInput(this.valueInStr);
+        this.setInputStyle();
 
         const startCoordinate = this.getStartCoordinate();
         const inputLayerRect = acgraph.rect(startCoordinate[0], startCoordinate[1], this.input.clientWidth, InputFontSize);
-
-        this.singleInputLayer = acgraph.layer();
-        this.singleInputLayer.clip(inputLayerRect);
+        this.singleInputLayer = acgraph.layer().clip(inputLayerRect);
         this.singleInputLayer.parent(timerStage);
 
         this.underbar = this.drawNewInputUnderbar(this.input.clientWidth);
@@ -130,20 +129,23 @@ class SingleInput {
     // }
 
     setValueInStr(newValueStr) {
-        this.setInputStyle(this.input, this.getStartCoordinate(), newValueStr);
         this.valueInStr = newValueStr;
+        this.setInputStyle();
     }
 
     setTopCenterCoordinate(newTopCenterCoordinate) {
         this.topCenterCoordinate = newTopCenterCoordinate;
-        this.setInputStyle(this.input, this.getStartCoordinate(), this.valueInStr);
 
-        this.underbar.setPosition(this.getUnderbarStartCoordinate[0], this.getUnderbarStartCoordinate[1]);
+        this.setInputStyle();
+
+        const underbarStartCoordinate = this.getUnderbarStartCoordinate();
+        this.underbar.setPosition(underbarStartCoordinate[0], underbarStartCoordinate[1]);
     }
 
     getStartCoordinate() {
-        let input_width = this.input.clientWidth;
-        return [this.topCenterCoordinate[0] - (input_width / 2), this.topCenterCoordinate[1]];
+        const inputWidth = this.input.clientWidth;
+
+        return [this.topCenterCoordinate[0] - (inputWidth / 2), this.topCenterCoordinate[1]];
     }
 
     getUnderbarStartCoordinate() {
@@ -151,25 +153,22 @@ class SingleInput {
         return [startCoordinate[0], startCoordinate[1] + InputFontSize];
     }
 
-    getInputTextStyle(start_coordinate, value) {
-        let style = "position:absolute;"
-            + "left:" + (start_coordinate == undefined ? 0 : start_coordinate[0]) + CssPositionUnit + ";"
-            + "top:" + (start_coordinate == undefined ? 0 : start_coordinate[1]) + CssPositionUnit + ";"
+    setInputStyle() {
+        const startCoordinate = this.getStartCoordinate();
+
+        this.input.style.cssText = "position:absolute;"
+            + "left:" + (startCoordinate == undefined ? 0 : startCoordinate[0]) + CssPositionUnit + ";"
+            + "top:" + (startCoordinate == undefined ? 0 : startCoordinate[1]) + CssPositionUnit + ";"
             + "height:" + InputFontSize + CssPositionUnit + ";"
-            + "width:" + (value.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
+            + "width:" + (this.valueInStr.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
             + "font-size:" + InputFontSize + CssPositionUnit + ";"
             + "text-align: center; border: none; background: none;";
-
-        return style;
-    }
-
-    setInputStyle(input, start_coordinate, value) {
-        input.style.cssText = this.getInputTextStyle(start_coordinate, value);
     }
 
     drawNewInputUnderbar(inputTextWidth) {
-        let underbarRectSize = [inputTextWidth, InputUnderbarHeight];
-        let underbar = acgraph.rect(this.getStartCoordinate[0], this.getStartCoordinate[1] + InputFontSize, underbarRectSize[0], underbarRectSize[1]);
+        const underbarRectSize = [inputTextWidth, InputUnderbarHeight];
+        const underbarStartCoordinate = this.getUnderbarStartCoordinate();
+        let underbar = acgraph.rect(underbarStartCoordinate[0], underbarStartCoordinate[1], underbarRectSize[0], underbarRectSize[1]);
         underbar.stroke(0);
         underbar.fill(input_bar_gray);
         underbar.parent(this.singleInputLayer);
@@ -178,13 +177,12 @@ class SingleInput {
     }
 
     drawNewInput(valueStr) {
-        let new_input = document.createElement('input');
-        document.getElementById("text_layer_in_timer_stage").appendChild(new_input);
-        new_input.type = "text";
-        new_input.value = valueStr;
-        this.setInputStyle(new_input, undefined, valueStr);
+        let newInput = document.createElement('input');
+        document.getElementById("text_layer_in_timer_stage").appendChild(newInput);
+        newInput.type = "text";
+        newInput.value = valueStr;
 
-        return new_input;
+        return newInput;
     }
 }
 
@@ -198,7 +196,7 @@ class InputAndButton {
 
         this.topCenterCoordinate = topCenterCoordinate;
 
-        this.singleInput = new SingleInput(this.inputTextStr, this.getSingleInputTopCenterCoordinate);
+        this.singleInput = new SingleInput(this.inputTextStr, this.topCenterCoordinate);
 
         const layerRect = new acgraph.rect(this.topCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.topCenterCoordinate[1], UpDownTriangleLineLen, UpDownTriangleHeight * 2 + ButtonInputMargin * 2 + InputFontSize);
         this.upDownButtonLayer = acgraph.layer().clip(layerRect);
@@ -356,7 +354,7 @@ class TimerContent {
     resetContentCoordinate() {
         this.contentLayer.setPosition(this.parentTimer.startCoordinate[0], this.parentTimer.startCoordinate[1]);
 
-        this.repeatInput.setTopCenterCoordinate(this.parentTimer.startCoordinate[0] + (TimerRectSize[0] / 2), this.parentTimer.startCoordinate[1]);
+        this.repeatInput.setTopCenterCoordinate([this.parentTimer.startCoordinate[0] + (TimerRectSize[0] / 2), this.parentTimer.startCoordinate[1]]);
     }
 
     getPresentRepeatInputCoordinate() {
@@ -759,9 +757,9 @@ class SingleTimer {
     //     this.leftTimerId = new_left_id;
     // }
 
-    setStartCoordinate(new_coordinate) {
-        this.startCoordinate = new_coordinate;
-        this.timerLayer.setPosition(new_coordinate[0], new_coordinate[1]);
+    setStartCoordinate(newCoordinate) {
+        this.startCoordinate = newCoordinate;
+        this.timerLayer.setPosition(newCoordinate[0], newCoordinate[1]);
         this.timerContent.resetContentCoordinate();
     }
 
