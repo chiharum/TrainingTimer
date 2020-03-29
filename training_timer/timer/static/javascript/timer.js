@@ -93,40 +93,12 @@ class SingleInput {
         this.setInputStyle();
 
         const startCoordinate = this.getStartCoordinate();
-        const inputLayerRect = acgraph.rect(startCoordinate[0], startCoordinate[1], this.input.clientWidth, InputFontSize);
+        const inputLayerRect = acgraph.rect(startCoordinate[0], startCoordinate[1], this.input.clientWidth, InputFontSize + InputUnderbarHeight);
         this.singleInputLayer = acgraph.layer().clip(inputLayerRect);
         this.singleInputLayer.parent(timerStage);
 
         this.underbar = this.drawNewInputUnderbar(this.input.clientWidth);
     }
-
-    // get singleInputLayer() {
-    //     return this.singleInputLayer;
-    // }
-
-    // get startCoordinate() {
-    //     return this.startCoordinate;
-    // }
-
-    // get input() {
-    //     return this.input;
-    // }
-
-    // get valueInStr() {
-    //     return this.valueInStr;
-    // }
-
-    // get topCenterCoordinate() {
-    //     return this.topCenterCoordinate;
-    // }
-
-    // get underbar() {
-    //     return this.underbar;
-    // }
-
-    // set startCoordinate(new_start_coordinate) {
-    //     this.startCoordinate = new_start_coordinate;
-    // }
 
     setValueInStr(newValueStr) {
         this.valueInStr = newValueStr;
@@ -196,7 +168,7 @@ class InputAndButton {
 
         this.topCenterCoordinate = topCenterCoordinate;
 
-        this.singleInput = new SingleInput(this.inputTextStr, this.topCenterCoordinate);
+        this.singleInput = new SingleInput(this.inputTextStr, this.getSingleInputTopCenterCoordinate());
 
         const layerRect = new acgraph.rect(this.topCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.topCenterCoordinate[1], UpDownTriangleLineLen, UpDownTriangleHeight * 2 + ButtonInputMargin * 2 + InputFontSize);
         this.upDownButtonLayer = acgraph.layer().clip(layerRect);
@@ -204,22 +176,6 @@ class InputAndButton {
 
         this.drawUpDownTriangle();
     }
-
-    // get upDownButtonLayer() {
-    //     return this.upDownButtonLayer;
-    // }
-
-    // get inputNum() {
-    //     return this.inputNum;
-    // }
-
-    // get keepTwoDigits() {
-    //     return this.keepTwoDigits;
-    // }
-
-    // get inputTextStr() {
-    //     return this.inputTextStr;
-    // }
 
     getPresentInputTextStr() {
         try {
@@ -245,13 +201,6 @@ class InputAndButton {
         return Math.max(this.getInputTextWidth, UpDownTriangleLineLen);
     }
 
-    setTopCenterCoordinate(newTopCenterCoordinate) {
-        this.topCenterCoordinate = newTopCenterCoordinate;
-
-        this.upDownButtonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
-        this.singleInput.setTopCenterCoordinate(newTopCenterCoordinate);
-    }
-
     getSingleInputTopCenterCoordinate() {
         return [this.topCenterCoordinate[0], this.topCenterCoordinate[1] + UpDownTriangleHeight + InputTextMargin];
     }
@@ -259,7 +208,14 @@ class InputAndButton {
     getDownButtonTriangleTopCoordinate() {
         const singleInputTopCenterCoordinate = this.getSingleInputTopCenterCoordinate();
 
-        return [singleInputTopCenterCoordinate[0], singleInputTopCenterCoordinate[1] + ButtonInputMargin + UpDownTriangleHeight];
+        return [singleInputTopCenterCoordinate[0], singleInputTopCenterCoordinate[1] + ButtonInputMargin + InputFontSize + UpDownTriangleHeight];
+    }
+
+    setTopCenterCoordinate(newTopCenterCoordinate) {
+        this.topCenterCoordinate = newTopCenterCoordinate;
+
+        this.upDownButtonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
+        this.singleInput.setTopCenterCoordinate(this.getSingleInputTopCenterCoordinate());
     }
 
     drawTriangle(top_coordinate, is_upward) {
@@ -354,7 +310,7 @@ class TimerContent {
     resetContentCoordinate() {
         this.contentLayer.setPosition(this.parentTimer.startCoordinate[0], this.parentTimer.startCoordinate[1]);
 
-        this.repeatInput.setTopCenterCoordinate([this.parentTimer.startCoordinate[0] + (TimerRectSize[0] / 2), this.parentTimer.startCoordinate[1]]);
+        this.repeatInput.setTopCenterCoordinate(this.getPresentRepeatInputCoordinate());
     }
 
     getPresentRepeatInputCoordinate() {
