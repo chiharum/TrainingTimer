@@ -89,20 +89,18 @@ class SingleInput {
 
         this.topCenterCoordinate = topCenterCoordinate;
 
-        this.input = this.drawNewInput(this.valueInStr);
+        this.input = this.makeNewInput(this.valueInStr);
         this.setInputStyle();
 
-        const startCoordinate = this.getStartCoordinate();
-        const inputLayerRect = acgraph.rect(startCoordinate[0], startCoordinate[1], this.input.clientWidth, InputFontSize + InputUnderbarHeight);
+        const inputLayerRect = acgraph.rect(topCenterCoordinate[0] - TimerRectSize[0] / 2, topCenterCoordinate[1], TimerRectSize[0], InputFontSize + InputUnderbarHeight);
         this.singleInputLayer = acgraph.layer().clip(inputLayerRect);
         this.singleInputLayer.parent(timerStage);
 
         this.underbar = this.drawNewInputUnderbar(this.input.clientWidth);
-    }
 
-    setValueInStr(newValueStr) {
-        this.valueInStr = newValueStr;
-        this.setInputStyle();
+        let input = this.input;
+
+        // this.input.addEventListener('keyup', this.setValueInStr(this.input.value), false);
     }
 
     setTopCenterCoordinate(newTopCenterCoordinate) {
@@ -137,6 +135,15 @@ class SingleInput {
             + "text-align: center; border: none; background: none;";
     }
 
+    setValueInStr(input) {
+        console.log(input.value);
+
+        this.valueInStr = input.value;
+        this.setInputStyle();
+
+        this.underbar.setWidth(input.clientWidth);
+    }
+
     drawNewInputUnderbar(inputTextWidth) {
         const underbarRectSize = [inputTextWidth, InputUnderbarHeight];
         const underbarStartCoordinate = this.getUnderbarStartCoordinate();
@@ -148,11 +155,13 @@ class SingleInput {
         return underbar;
     }
 
-    drawNewInput(valueStr) {
+    makeNewInput(valueStr) {
         let newInput = document.createElement('input');
         document.getElementById("text_layer_in_timer_stage").appendChild(newInput);
         newInput.type = "text";
         newInput.value = valueStr;
+
+        newInput.addEventListener('keyup', this.setValueInStr(newInput), false);
 
         return newInput;
     }
