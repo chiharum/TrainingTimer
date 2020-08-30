@@ -31,7 +31,7 @@
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../大学/情報基礎B/test.py" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../python tools/FileControler" />
   </component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
@@ -67,9 +67,9 @@
     <option featureType="com.intellij.fileTypeFactory" implementationName="*.js" />
   </component>
   <component name="WindowStateProjectService">
-    <state x="421" y="105" key="FileChooserDialogImpl" timestamp="1583484911942">
+    <state x="421" y="105" key="FileChooserDialogImpl" timestamp="1586843029026">
       <screen x="0" y="0" width="1280" height="720" />
     </state>
-    <state x="421" y="105" key="FileChooserDialogImpl/0.0.1280.720@0.0.1280.720" timestamp="1583484911942" />
+    <state x="421" y="105" key="FileChooserDialogImpl/0.0.1280.720@0.0.1280.720" timestamp="1586843029026" />
   </component>
 </project>

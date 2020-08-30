@@ -98,9 +98,7 @@ class SingleInput {
 
         this.underbar = this.drawNewInputUnderbar(this.input.clientWidth);
 
-        let input = this.input;
-
-        // this.input.addEventListener('keyup', this.setValueInStr(this.input.value), false);
+        this.input.addEventListener('keyup', () => { this.setValue() }, false);
     }
 
     setTopCenterCoordinate(newTopCenterCoordinate) {
@@ -130,18 +128,17 @@ class SingleInput {
             + "left:" + (startCoordinate == undefined ? 0 : startCoordinate[0]) + CssPositionUnit + ";"
             + "top:" + (startCoordinate == undefined ? 0 : startCoordinate[1]) + CssPositionUnit + ";"
             + "height:" + InputFontSize + CssPositionUnit + ";"
-            + "width:" + (this.valueInStr.toString(10).length * InputFontSize).toString(10) + CssPositionUnit + ";"
+            + "width:" + (this.valueInStr.toString().length * InputFontSize / 2).toString() + CssPositionUnit + ";"
             + "font-size:" + InputFontSize + CssPositionUnit + ";"
             + "text-align: center; border: none; background: none;";
     }
 
-    setValueInStr(input) {
-        console.log(input.value);
-
-        this.valueInStr = input.value;
+    setValue() {
+        this.valueInStr = this.input.value;
         this.setInputStyle();
 
-        this.underbar.setWidth(input.clientWidth);
+        this.underbar.setPosition(this.getUnderbarStartCoordinate());
+        this.underbar.setWidth(this.input.clientWidth);
     }
 
     drawNewInputUnderbar(inputTextWidth) {
@@ -160,8 +157,6 @@ class SingleInput {
         document.getElementById("text_layer_in_timer_stage").appendChild(newInput);
         newInput.type = "text";
         newInput.value = valueStr;
-
-        newInput.addEventListener('keyup', this.setValueInStr(newInput), false);
 
         return newInput;
     }
@@ -789,7 +784,7 @@ class SingleTimer {
         if (userTimerList.timerList.length == 0) {
             let leftPlusButton = this.drawCircle([this.startCoordinate[0] - TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], leftPlusButtonLayer);
 
-            leftPlusButton.listen('click', function () {
+            leftPlusButton.listen('click', () => {
                 userTimerList.timerList[0].circlePushedAnimation(leftPlusButton, function () {
                     timerStage.suspend();
 
@@ -802,7 +797,7 @@ class SingleTimer {
         }
 
         let cancelButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + DifCircleCenterAndRectCorner], this.timerLayer);
-        cancelButton.listen('click', function (e) {
+        cancelButton.listen('click', () => {
             userTimerList.getTimerById(thisTimerId).circlePushedAnimation(cancelButton, function () {
 
                 timerStage.suspend();
@@ -815,7 +810,7 @@ class SingleTimer {
         this.setAsButton(cancelButton);
 
         let rightPlusButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] + TimerMargin / 2, this.startCoordinate[1] + TimerRectSize[1] / 2], this.timerLayer);
-        rightPlusButton.listen('click', function () {
+        rightPlusButton.listen('click', () => {
 
             let thisTimer = userTimerList.getTimerById(thisTimerId);
 
@@ -831,8 +826,8 @@ class SingleTimer {
         this.setAsButton(rightPlusButton);
 
         let rightBottomButton = this.drawCircle([this.startCoordinate[0] + TimerRectSize[0] - DifCircleCenterAndRectCorner, this.startCoordinate[1] + TimerRectSize[1] - DifCircleCenterAndRectCorner], this.timerLayer);
-        rightBottomButton.listen('click', function (e) {
-            let thisTimer = userTimerList.getTimerById(thisTimerId);
+        rightBottomButton.listen('click', () => {
+            let thisTimer = userTimerList.getTimerById(this.timerId);
             thisTimer.circlePushedAnimation(rightBottomButton, function () { });
         });
         this.setAsButton(rightBottomButton);
