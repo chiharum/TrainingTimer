@@ -1,6 +1,6 @@
 
-# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,django
-# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,python,django
+# Created by https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,venv,django
+# Edit at https://www.toptal.com/developers/gitignore?templates=windows,visualstudiocode,python,venv,django
 
 ### Django ###
 *.log
@@ -205,6 +205,18 @@ dmypy.json
 
 # pytype static type analyzer
 
+### venv ###
+# Virtualenv
+# http://iamzed.com/2009/05/07/a-primer-on-virtualenv/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+pip-selfcheck.json
+
 ### VisualStudioCode ###
 .vscode/*
 !.vscode/settings.json
@@ -243,4 +255,4 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,django
+# End of https://www.toptal.com/developers/gitignore/api/windows,visualstudiocode,python,venv,django
