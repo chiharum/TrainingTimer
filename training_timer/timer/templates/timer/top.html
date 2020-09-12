@@ -21,12 +21,24 @@
 
 <body>
     <div id="timer_stage_frame">
-        <div id="timer_stage">
-            <div id="text_layer_in_timer_stage" style="position: relative; top: 0px; left: 0px; z-index: 2;"></div>
+        <div id="timer_stage" style="position: absolute;">
+            <div id="text_layer_in_timer_stage" style="position: absolute; top: 0px; left: 0px; z-index: 2;"></div>
         </div>
+        <!-- <div id="text_layer_in_timer_stage" style="position: relative; top: 0px; left: 0px; z-index: 2;"></div> -->
     </div>
+
     <script src="https://cdn.anychart.com/js/latest/graphics.min.js"></script>
+
     <script type="text/javascript" src="{% static 'javascript/colors.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/ConstValues.js' %}"></script>
+
+    <script type="text/javascript" src="{% static 'javascript/GeneralShapes.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/SingleInput.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/NumericInput.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/TimerContent.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/SingleTimer.js' %}"></script>
+    <script type="text/javascript" src="{% static 'javascript/TimerSet.js' %}"></script>
+
     <script type="text/javascript" src="{% static 'javascript/timer.js' %}"></script>
 </body>
 
