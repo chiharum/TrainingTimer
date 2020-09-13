@@ -7,11 +7,9 @@ class SingleTimer {
         this.rectLayer = acgraph.layer().clip(groupRect);
         this.rectLayer.parent(parentLayer);
 
-        console.log("rect top-left: " + this.topLeftCoordinate);
-
         this._drawTimerRect();
 
-        this.timerContent = new TimerContent(this.rectLayer, this);
+        // this.timerContent = new TimerContent(this.rectLayer, this);
     }
 
     getTopLeftCoordinate() {
@@ -21,48 +19,6 @@ class SingleTimer {
     setTopLeftCoordinate(newCoordinate) {
         this.topLeftCoordinate = newCoordinate;
         this.rectLayer.setPosition(newCoordinate[0], newCoordinate[1]);
-
-        console.log("rect new coordinate: " + newCoordinate);
-
-        console.log("rect layer top-left x: " + this.rectLayer.getAbsoluteX());
-    }
-
-    circlePushedAnimation(singleCircle, callback) {
-
-        let presentRadius = CircleRadius;
-        let deflated = false;
-        let inflated = false;
-
-        function animateCircle(animationTimer, callback) {
-            if (presentRadius > CircleRadius * 0.9 && !deflated) {
-                presentRadius -= 0.2;
-                singleCircle.setRadius(presentRadius, presentRadius);
-            } else if (presentRadius < CircleRadius && !inflated) {
-                if (!deflated) {
-                    deflated = true;
-                }
-                presentRadius += 0.2;
-                singleCircle.setRadius(presentRadius, presentRadius);
-            } else if (deflated && presentRadius >= CircleRadius && !inflated) {
-                inflated = true;
-                clearInterval(animationTimer);
-
-                callback();
-            }
-        }
-
-        let animationTimer = setInterval(animateCircle, PushedScaleInterval, animationTimer, callback);
-    }
-
-    // 移動中
-    drawCircle(centerCoordinate, layer) {
-        let single_circle = acgraph.circle(centerCoordinate[0], centerCoordinate[1], CircleRadius);
-        single_circle.fill(ColorLightBlue);
-        single_circle.stroke(0);
-        single_circle.zIndex(CircleZIndex);
-        layer.addChild(single_circle);
-
-        return single_circle;
     }
 
     _drawTimerRect() {

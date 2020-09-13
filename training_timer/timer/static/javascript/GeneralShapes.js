@@ -19,7 +19,7 @@ function animatePathObject(path_object, callback) {
     }, PathPushedAnimationInterval, callback);
 }
 
-class Circle {
+class CircleButton {
 
     constructor(parentLayer, defaultCenterCoordinate, radius, color, onClick, zIndex) {
         this.centerCoordinate = defaultCenterCoordinate;
@@ -27,8 +27,6 @@ class Circle {
         this.color = color;
         this.zIndex = zIndex;
         this.parentLayer = parentLayer;
-
-        console.log("Circle center: " + this.centerCoordinate);
 
         this.circle = this._drawCircle();
 

@@ -1,3 +1,20 @@
+class CircleButtonItem extends CircleButton {
+
+    constructor(index, parentLayer, defaultCenterCoordinate, onClick) {
+        super(parentLayer, defaultCenterCoordinate, CircleRadius, ColorLightBlue, onClick, CircleZIndex);
+
+        this.index = index;
+    }
+
+    get index() {
+        return this._index;
+    }
+
+    set index(newIndex) {
+        this._index = newIndex;
+    }
+}
+
 class TimerSet {
 
     constructor() {
@@ -5,6 +22,7 @@ class TimerSet {
 
         this.timerList = [];
         this.plusButtonList = [];
+        this.cancelButtonList = [];
 
         this.timerStage = acgraph.create('timer_stage');
 
@@ -18,6 +36,7 @@ class TimerSet {
         this.cancelButtonSetLayer.zIndex(CircleZIndex);
 
         this._createNewTimer(0);
+        this._createNewCancelButton(0);
 
         this._createNewPlusButton(0);
         this._createNewPlusButton(1);
@@ -25,47 +44,33 @@ class TimerSet {
 
     _resetTimerStageDivWidth() {
         let divWidth = FirstRectTopLeftCoordinate[0] + (SingleTimerWidth * this.timerList.length) + TimerMargin;
-        this.timerStageDiv.style.width = divWidth.toString() + "px";
+        this.timerStageDiv.style.width = Math.max(divWidth, 3000).toString() + "px";
     }
 
-    _calcTopLeftCoordinate(index) {
+    _calcTimerTopLeftCoordinate(index) {
         let x = FirstRectTopLeftCoordinate[0] + (TimerRectSize[0] + TimerMargin) * index;
         let y = FirstRectTopLeftCoordinate[1];
 
         return [x, y];
     }
 
-    _eraseTimer(erasingTimerIndex) {
-        if (this.timerList.length > 1) {
-            this.timerList.splice(erasingTimerIndex, 1);
-
-            this._resetEveryTimerPosition();
-            this._resetTimerStageDivWidth();
+    _resetEveryTimerPosition() {
+        for (let index = 0; index < this.timerList.length; ++index) {
+            this.timerList[index].setTopLeftCoordinate(this._calcTimerTopLeftCoordinate(index));
         }
     }
 
     _calcCancelButtonCenterCoordinate(index) {
-        
+        let x = this._calcTimerTopLeftCoordinate(index)[0] + TimerRectSize[0] - DifTopRightCircleCenterAndRectCorner;
+        let y = FirstRectTopLeftCoordinate[1] + DifTopRightCircleCenterAndRectCorner;
+        return [x, y];
     }
 
-    _createNewCancelButton(newIndex) {
-        let newCircle = new Circle(this.cancelButtonSetLayer, [0, 0], CircleRadius, ColorLightBlue, () => {
-        });
-    }
-
-    _resetEveryTimerPosition() {
-        for (let index = 0; index < this.timerList.length; ++index) {
-            this.timerList[index].setTopLeftCoordinate(this._calcTopLeftCoordinate(index));
+    _resetEveryCancelButtonPosition() {
+        for (let index = 0; index < this.cancelButtonList.length; ++index) {
+            this.cancelButtonList[index].index = index;
+            this.cancelButtonList[index].setCenterCoordinate(this._calcCancelButtonCenterCoordinate(index));
         }
-    }
-
-    _createNewTimer(newIndex) {
-        let newSingleTimer = new SingleTimer(this.rectSetLayer, this._calcTopLeftCoordinate(newIndex));
-
-        this.timerList.splice(newIndex, 0, newSingleTimer);
-
-        this._resetTimerStageDivWidth();
-        this._resetEveryTimerPosition();
     }
 
     _calcPlusButtonCenterCoordinate(index) {
@@ -75,19 +80,76 @@ class TimerSet {
         return [x, y];
     }
 
-    _resetEveryPlusButtonCoordinate() {
+    _resetEveryPlusButtonPosition() {
         for (let index = 0; index < this.plusButtonList.length; ++index) {
+            this.plusButtonList[index].index = index;
             this.plusButtonList[index].setCenterCoordinate(this._calcPlusButtonCenterCoordinate(index));
         }
     }
 
-    _createNewPlusButton(newIndex) {
-        let newCircle = new Circle(this.plusButtonSetLayer, this._calcPlusButtonCenterCoordinate(newIndex), CircleRadius, ColorLightBlue, () => {
-            this._createNewTimer(newIndex);
-            this._createNewPlusButton(newIndex + 1);
+    _eraseTimer(erasingIndex) {
+        if (this.timerList.length > 1) {
+            this.timerList[erasingIndex].rectLayer.dispose();
+
+            this.timerList.splice(erasingIndex, 1);
+
+            this._resetEveryTimerPosition();
+            this._resetTimerStageDivWidth();
+        }
+    }
+
+    _eraseCancelButton(erasingIndex) {
+        if (this.cancelButtonList.length > 1) {
+            this.cancelButtonList[erasingIndex].circle.dispose();
+
+            this.cancelButtonList.splice(erasingIndex, 1);
+
+            this._resetEveryCancelButtonPosition();
+        }
+    }
+
+    _erasePlusButton(erasingIndex) {
+        if (this.plusButtonList.length > 2) {
+            this.plusButtonList[erasingIndex].circle.dispose();
+
+            this.plusButtonList.splice(erasingIndex, 1);
+
+            this._resetEveryPlusButtonPosition();
+        }
+    }
+
+    _createNewTimer(newIndex) {
+        let newSingleTimer = new SingleTimer(this.rectSetLayer, this._calcTimerTopLeftCoordinate(newIndex));
+
+        this.timerList.splice(newIndex, 0, newSingleTimer);
+
+        this._resetTimerStageDivWidth();
+        this._resetEveryTimerPosition();
+    }
+
+    _createNewCancelButton(newIndex) {
+
+        let newCancelButtonItem = new CircleButtonItem(newIndex, this.cancelButtonSetLayer, this._calcCancelButtonCenterCoordinate(newIndex), () => {
+            let index = newCancelButtonItem.index;
+            this._eraseTimer(index);
+            this._erasePlusButton(index + 1);
+            this._eraseCancelButton(index);
         });
 
-        this.plusButtonList.splice(newIndex, 0, newCircle);
-        this._resetEveryPlusButtonCoordinate();
+        this.cancelButtonList.splice(newIndex, 0, newCancelButtonItem);
+        this._resetEveryCancelButtonPosition();
+    }
+
+    _createNewPlusButton(newIndex) {
+
+        let newPlusCircleButton = new CircleButtonItem(newIndex, this.plusButtonSetLayer, this._calcPlusButtonCenterCoordinate(newIndex), () => {
+            let index = newPlusCircleButton.index;
+            this._createNewTimer(index);
+            this._createNewPlusButton(index);
+            this._createNewCancelButton(index);
+        });
+
+        this.plusButtonList.splice(newIndex, 0, newPlusCircleButton);
+        this._resetEveryPlusButtonPosition();
     }
 }
