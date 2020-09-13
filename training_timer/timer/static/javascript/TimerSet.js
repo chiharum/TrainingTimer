@@ -44,7 +44,7 @@ class TimerSet {
 
     _resetTimerStageDivWidth() {
         let divWidth = FirstRectTopLeftCoordinate[0] + (SingleTimerWidth * this.timerList.length) + TimerMargin;
-        this.timerStageDiv.style.width = Math.max(divWidth, 3000).toString() + "px";
+        this.timerStageDiv.style.width = divWidth.toString() + "px";
     }
 
     _calcTimerTopLeftCoordinate(index) {
@@ -89,7 +89,7 @@ class TimerSet {
 
     _eraseTimer(erasingIndex) {
         if (this.timerList.length > 1) {
-            this.timerList[erasingIndex].rectLayer.dispose();
+            this.timerList[erasingIndex].timerLayer.dispose();
 
             this.timerList.splice(erasingIndex, 1);
 

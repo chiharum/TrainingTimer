@@ -1,8 +1,6 @@
 class SingleInput {
 
     constructor(parentLayer, defaultValue, topCenterCoordinate) {
-        this.parentLayer = parentLayer;
-
         this.inputTopCenterCoordinate = topCenterCoordinate;
 
         this.input = this._makeNewInput(defaultValue);
@@ -27,7 +25,7 @@ class SingleInput {
     }
 
     _resetInputStyle() {
-        let width = Math.min(this.input.value.length * InputFontSize, this.parentLayer.getAbsoluteWidth());
+        let width = Math.min(this.input.value.length * InputFontSize, TimerRectSize[0]);
 
         let topLeftCoordinate = [this.inputTopCenterCoordinate[0] - (width / 2), this.inputTopCenterCoordinate[1]];
 

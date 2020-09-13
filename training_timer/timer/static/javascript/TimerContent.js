@@ -1,9 +1,9 @@
 class TimerContent {
 
-    constructor(parentLayer, parentTimer) {
-        this.parentTimer = parentTimer;
+    constructor(parentLayer, defaultCoordinate) {
+        this.topLeftCoordinate = defaultCoordinate;
 
-        const contentLayerRect = acgraph.rect(this.parentTimer.getTopLeftCoordinate()[0], this.parentTimer.getTopLeftCoordinate()[1], TimerRectSize[0], TimerRectSize[1]);
+        const contentLayerRect = acgraph.rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
         this.contentLayer = acgraph.layer().clip(contentLayerRect);
         this.contentLayer.parent(parentLayer);
 
@@ -19,19 +19,22 @@ class TimerContent {
     }
 
     _getRepeatInputTopCenterCoordinate() {
-        let x = this.parentTimer.getTopLeftCoordinate()[0] + TimerRectSize[0] / 2;
-        let y = this.parentTimer.getTopLeftCoordinate()[1] + ContentTopMargin;
+        let x = this.topLeftCoordinate[0] + TimerRectSize[0] / 2;
+        let y = this.topLeftCoordinate[1] + ContentTopMargin;
 
         return [x, y];
     }
 
-    // setTopLeftCoordinate(newCoordinate) {
-    //     this.topLeftCoordinate = newCoordinate;
+    setTopLeftCoordinate(newCoordinate) {
+        this.topLeftCoordinate = newCoordinate;
 
-    //     this.contentLayer.setPosition(newCoordinate[0], newCoordinate[1]);
+        this.contentLayer.setPosition(newCoordinate[0], newCoordinate[1]);
 
-    //     this.repeatInput.setTopCenterCoordinate(this._getRepeatInputTopCenterCoordinate());
-    // }
+        this.repeatInput.setTopCenterCoordinate(this._getRepeatInputTopCenterCoordinate());
+
+        console.log("top left: " + this.topLeftCoordinate);
+        console.log("top center: " + this._getRepeatInputTopCenterCoordinate());
+    }
 
     /*
     以下不要かも～

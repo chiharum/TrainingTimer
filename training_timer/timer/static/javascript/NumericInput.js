@@ -50,6 +50,9 @@ class NumericInput {
     setTopCenterCoordinate(newTopCenterCoordinate) {
         this.inputTopCenterCoordinate = newTopCenterCoordinate;
 
+        console.log("button layer position: " + [newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]]);
+
+        // setPositionとtranslateの違いを検証した方がよさそう
         this.buttonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
         this.singleInput.setTopCenterCoordinate(this._getSingleInputTopCenterCoordinate());
     }
