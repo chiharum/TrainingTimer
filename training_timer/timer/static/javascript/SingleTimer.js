@@ -3,9 +3,9 @@ class SingleTimer {
     constructor(parentLayer, defaultTopLeftCoordinate) {
         this.topLeftCoordinate = defaultTopLeftCoordinate;
 
-        let groupRect = new acgraph.rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
-        this.timerLayer = acgraph.layer().clip(groupRect);
+        this.timerLayer = acgraph.layer();
         this.timerLayer.parent(parentLayer);
+        this.timerLayer.setPosition(this.topLeftCoordinate[0], this.topLeftCoordinate[1]);
 
         this._drawTimerRect();
 

@@ -28,6 +28,8 @@ const DurationDotFontSize = InputFontSize;
 const ContentTopMargin = 10;
 const ButtonInputMargin = 10;
 const InputTextMargin = 5;
+// position
+const RepeatInputTopCenterCoordinateRelative = [ContentTopMargin, TimerRectSize[1] / 2];
 // value
 const DefaultDuration = 0;
 const DefaultRepeatNum = 1;

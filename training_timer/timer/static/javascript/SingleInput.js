@@ -1,14 +1,14 @@
 class SingleInput {
 
-    constructor(parentLayer, defaultValue, topCenterCoordinate) {
+    constructor(parentLayer, defaultValue, topCenterCoordinate, topCenterCoordinateRelative) {
         this.inputTopCenterCoordinate = topCenterCoordinate;
+        this.topCenterCoordinateRelative = topCenterCoordinateRelative;
 
         this.input = this._makeNewInput(defaultValue);
         this._resetInputStyle();
 
-        let inputLayerRect = acgraph.rect(this.inputTopCenterCoordinate[0] - (TimerRectSize[0] / 2), this.inputTopCenterCoordinate[1], TimerRectSize[0], InputFontSize + InputUnderbarHeight);
-        this.inputLayer = acgraph.layer().clip(inputLayerRect);
-        this.inputLayer.parent(parentLayer);
+        this.inputLayer = parentLayer.acgraph.layer();
+        this.inputLayer.setPosition(topCenterCoordinateRelative);
 
         this.underbar = this._drawNewInputUnderbar(this.input.clientWidth);
     }

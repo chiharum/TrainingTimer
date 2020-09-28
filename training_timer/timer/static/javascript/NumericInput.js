@@ -8,9 +8,12 @@ class NumericInput {
 
         this.singleInput = new SingleInput(parentLayer, this._getPresentInputStr(), this._getSingleInputTopCenterCoordinate());
 
-        const buttonLayerRect = new acgraph.rect(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1], UpDownTriangleLineLen, UpDownTriangleHeight * 2 + ButtonInputMargin * 2 + InputFontSize);
-        this.buttonLayer = acgraph.layer().clip(buttonLayerRect);
-        this.buttonLayer.parent(parentLayer);
+        console.log("button layer rect top left: " + [this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]]);
+
+        this.buttonLayer = parentLayer.layer();
+        this.buttonLayer.setPosition(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]);
+
+        console.log("button layer top left output at top: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
 
         this.drawUpDownTriangle();
     }
@@ -50,11 +53,19 @@ class NumericInput {
     setTopCenterCoordinate(newTopCenterCoordinate) {
         this.inputTopCenterCoordinate = newTopCenterCoordinate;
 
-        console.log("button layer position: " + [newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]]);
+        console.log("button layer top left output before: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
+
+        console.log("button layer top left setto: " + [newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]]);
+
+        // this.buttonLayer.translate((newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2) - this.buttonLayer.getAbsoluteX(), newTopCenterCoordinate[1] - this.buttonLayer.getAbsoluteY());
 
         // setPositionとtranslateの違いを検証した方がよさそう
         this.buttonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
         this.singleInput.setTopCenterCoordinate(this._getSingleInputTopCenterCoordinate());
+
+        console.log("button layer top left output after: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
+
+        console.log("button layer coordinate in parent coordinate system after set: " + [this.buttonLayer.getX(), this.buttonLayer.getY()]);
     }
 
     _getTrianglePointSet(start_coordinate, bool_is_up) {
@@ -67,8 +78,8 @@ class NumericInput {
         return [[x1, y1], [x2, y2], [x3, y3]];
     }
 
-    drawTriangle(top_coordinate, is_upward) {
-        const trianglePointsSet = this._getTrianglePointSet(top_coordinate, is_upward);
+    drawTriangle(topPointCoordinate, isUpward) {
+        const trianglePointsSet = this._getTrianglePointSet(topPointCoordinate, isUpward);
         let triangle = acgraph.path();
         triangle.stroke(0);
         triangle.moveTo(trianglePointsSet[0][0], trianglePointsSet[0][1]);
