@@ -55,12 +55,12 @@ class NumericInput {
 
         console.log("button layer top left output before: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
 
-        console.log("button layer top left setto: " + [newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]]);
+        console.log("button layer top left setto: " + [this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]]);
 
         // this.buttonLayer.translate((newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2) - this.buttonLayer.getAbsoluteX(), newTopCenterCoordinate[1] - this.buttonLayer.getAbsoluteY());
 
         // setPositionとtranslateの違いを検証した方がよさそう
-        this.buttonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
+        this.buttonLayer.setPosition(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]);
         this.singleInput.setTopCenterCoordinate(this._getSingleInputTopCenterCoordinate());
 
         console.log("button layer top left output after: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);

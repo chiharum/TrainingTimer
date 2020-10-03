@@ -3,13 +3,14 @@ class SingleTimer {
     constructor(parentLayer, defaultTopLeftCoordinate) {
         this.topLeftCoordinate = defaultTopLeftCoordinate;
 
-        this.timerLayer = acgraph.layer();
-        this.timerLayer.parent(parentLayer);
-        this.timerLayer.setPosition(this.topLeftCoordinate[0], this.topLeftCoordinate[1]);
+        this.timerLayer = parentLayer.layer();
+        // this.timerLayer.setPosition(this.topLeftCoordinate[0], this.topLeftCoordinate[1]);
 
         this._drawTimerRect();
 
-        this.timerContent = new TimerContent(this.timerLayer, this.topLeftCoordinate);
+        this.timerContent = new TimerContent(this.timerLayer, [0, 0]);
+
+        // this.setTopLeftCoordinate(this.topLeftCoordinate);
     }
 
     get timerLayer() {
@@ -31,10 +32,10 @@ class SingleTimer {
     }
 
     _drawTimerRect() {
-        const timerRectBaseRect = new acgraph.math.Rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
-        let timerRect = acgraph.vector.primitives.roundedRect(this.timerLayer, timerRectBaseRect, TimerRectCornerRadius);
+        // const timerBaseRect = new acgraph.math.Rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
+        const timerBaseRect = new acgraph.math.Rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
+        let timerRect = this.timerLayer.roundedRect(timerBaseRect, TimerRectCornerRadius);
         timerRect.fill(ColorLightGreen);
         timerRect.stroke(0);
-        this.timerLayer.addChild(timerRect);
     }
 }

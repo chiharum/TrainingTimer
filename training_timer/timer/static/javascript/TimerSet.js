@@ -26,8 +26,8 @@ class TimerSet {
 
         this.timerStage = acgraph.create('timer_stage');
 
-        this.rectSetLayer = this.timerStage.layer();
-        this.rectSetLayer.zIndex(TimerRectZIndex);
+        this.rectLayer = this.timerStage.layer();
+        this.rectLayer.zIndex(TimerRectZIndex);
 
         this.plusButtonSetLayer = this.timerStage.layer();
         this.plusButtonSetLayer.zIndex(CircleZIndex);
@@ -119,7 +119,7 @@ class TimerSet {
     }
 
     _createNewTimer(newIndex) {
-        let newSingleTimer = new SingleTimer(this.rectSetLayer, this._calcTimerTopLeftCoordinate(newIndex));
+        let newSingleTimer = new SingleTimer(this.rectLayer, this._calcTimerTopLeftCoordinate(newIndex));
 
         this.timerList.splice(newIndex, 0, newSingleTimer);
 

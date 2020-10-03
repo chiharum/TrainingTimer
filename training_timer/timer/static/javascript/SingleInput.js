@@ -7,7 +7,7 @@ class SingleInput {
         this.input = this._makeNewInput(defaultValue);
         this._resetInputStyle();
 
-        this.inputLayer = parentLayer.acgraph.layer();
+        this.inputLayer = parentLayer.layer();
         this.inputLayer.setPosition(topCenterCoordinateRelative);
 
         this.underbar = this._drawNewInputUnderbar(this.input.clientWidth);
