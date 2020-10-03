@@ -4,21 +4,10 @@ class SingleTimer {
         this.topLeftCoordinate = defaultTopLeftCoordinate;
 
         this.timerLayer = parentLayer.layer();
-        // this.timerLayer.setPosition(this.topLeftCoordinate[0], this.topLeftCoordinate[1]);
 
         this._drawTimerRect();
 
-        this.timerContent = new TimerContent(this.timerLayer, [0, 0]);
-
-        // this.setTopLeftCoordinate(this.topLeftCoordinate);
-    }
-
-    get timerLayer() {
-        return this._timerLayer;
-    }
-
-    set timerLayer(newLayer) {
-        this._timerLayer = newLayer;
+        this.timerContent = new TimerContent(parentLayer, [0, 0]);
     }
 
     getTopLeftCoordinate() {

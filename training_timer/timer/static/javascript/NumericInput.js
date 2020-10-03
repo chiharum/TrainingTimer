@@ -1,19 +1,14 @@
 class NumericInput {
 
-    constructor(parentLayer, defaultNum, keepTwoDigits, topCenterCoordinate) {
+    constructor(parentLayer, defaultNum, keepTwoDigits, defaultTopCenterCoordinate) {
         this.inputNum = defaultNum;
         this.keepTwoDigits = keepTwoDigits;
 
-        this.inputTopCenterCoordinate = topCenterCoordinate;
+        this.topCenterCoordinate = defaultTopCenterCoordinate;
 
         this.singleInput = new SingleInput(parentLayer, this._getPresentInputStr(), this._getSingleInputTopCenterCoordinate());
 
-        console.log("button layer rect top left: " + [this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]]);
-
         this.buttonLayer = parentLayer.layer();
-        this.buttonLayer.setPosition(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]);
-
-        console.log("button layer top left output at top: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
 
         this.drawUpDownTriangle();
     }
@@ -41,7 +36,7 @@ class NumericInput {
     }
 
     _getSingleInputTopCenterCoordinate() {
-        return [this.inputTopCenterCoordinate[0], this.inputTopCenterCoordinate[1] + UpDownTriangleHeight + InputTextMargin];
+        return [this.topCenterCoordinate[0], this.topCenterCoordinate[1] + UpDownTriangleHeight + InputTextMargin];
     }
 
     _getDownButtonTriangleTopCoordinate() {
@@ -51,21 +46,11 @@ class NumericInput {
     }
 
     setTopCenterCoordinate(newTopCenterCoordinate) {
-        this.inputTopCenterCoordinate = newTopCenterCoordinate;
-
-        console.log("button layer top left output before: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
-
-        console.log("button layer top left setto: " + [this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]]);
-
-        // this.buttonLayer.translate((newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2) - this.buttonLayer.getAbsoluteX(), newTopCenterCoordinate[1] - this.buttonLayer.getAbsoluteY());
+        this.topCenterCoordinate = newTopCenterCoordinate;
 
         // setPositionとtranslateの違いを検証した方がよさそう
-        this.buttonLayer.setPosition(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1]);
+        this.buttonLayer.setPosition(this.topCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.topCenterCoordinate[1]);
         this.singleInput.setTopCenterCoordinate(this._getSingleInputTopCenterCoordinate());
-
-        console.log("button layer top left output after: " + [this.buttonLayer.getAbsoluteX(), this.buttonLayer.getAbsoluteY()]);
-
-        console.log("button layer coordinate in parent coordinate system after set: " + [this.buttonLayer.getX(), this.buttonLayer.getY()]);
     }
 
     _getTrianglePointSet(start_coordinate, bool_is_up) {
@@ -93,7 +78,7 @@ class NumericInput {
     }
 
     drawUpDownTriangle() {
-        let upButtonTriangle = this.drawTriangle(this.inputTopCenterCoordinate, true);
+        let upButtonTriangle = this.drawTriangle(this.topCenterCoordinate, true);
         let downButtonTriangle = this.drawTriangle(this._getDownButtonTriangleTopCoordinate(), false);
 
         upButtonTriangle.listen('click', function () {
