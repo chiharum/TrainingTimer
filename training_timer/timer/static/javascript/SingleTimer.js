@@ -20,6 +20,12 @@ class SingleTimer {
         this.timerContent.setTopLeftCoordinate(newCoordinate);
     }
 
+    eraseSingleTimer() {
+        this.timerContent.eraseTimerContent();
+
+        this.timerLayer.dispose();
+    }
+
     _drawTimerRect() {
         // const timerBaseRect = new acgraph.math.Rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);
         const timerBaseRect = new acgraph.math.Rect(this.topLeftCoordinate[0], this.topLeftCoordinate[1], TimerRectSize[0], TimerRectSize[1]);

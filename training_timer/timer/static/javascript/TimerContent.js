@@ -27,4 +27,8 @@ class TimerContent {
         this.topLeftCoordinate = newCoordinate;
         this.repeatInput.setTopCenterCoordinate(this._getRepeatInputTopCenterCoordinate());
     }
+
+    eraseTimerContent() {
+        this.repeatInput.eraseNumericInput();
+    }
 }

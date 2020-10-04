@@ -73,4 +73,8 @@ class SingleInput {
 
         this._resetUnderbarPosition();
     }
+
+    eraseInput() {
+        this.input.remove();
+    }
 }

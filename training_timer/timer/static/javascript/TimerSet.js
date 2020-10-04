@@ -89,7 +89,7 @@ class TimerSet {
 
     _eraseTimer(erasingIndex) {
         if (this.timerList.length > 1) {
-            this.timerList[erasingIndex].timerLayer.dispose();
+            this.timerList[erasingIndex].eraseSingleTimer();
 
             this.timerList.splice(erasingIndex, 1);
 

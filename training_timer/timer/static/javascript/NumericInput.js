@@ -10,7 +10,7 @@ class NumericInput {
 
         this.buttonLayer = parentLayer.layer();
 
-        this.drawUpDownTriangle();
+        this._drawUpDownTriangle();
     }
 
     _getPresentInputStr() {
@@ -63,7 +63,7 @@ class NumericInput {
         return [[x1, y1], [x2, y2], [x3, y3]];
     }
 
-    drawTriangle(topPointCoordinate, isUpward) {
+    _drawTriangle(topPointCoordinate, isUpward) {
         const trianglePointsSet = this._getTrianglePointSet(topPointCoordinate, isUpward);
         let triangle = acgraph.path();
         triangle.stroke(0);
@@ -77,9 +77,9 @@ class NumericInput {
         return triangle;
     }
 
-    drawUpDownTriangle() {
-        let upButtonTriangle = this.drawTriangle(this.topCenterCoordinate, true);
-        let downButtonTriangle = this.drawTriangle(this._getDownButtonTriangleTopCoordinate(), false);
+    _drawUpDownTriangle() {
+        let upButtonTriangle = this._drawTriangle(this.topCenterCoordinate, true);
+        let downButtonTriangle = this._drawTriangle(this._getDownButtonTriangleTopCoordinate(), false);
 
         upButtonTriangle.listen('click', function () {
             // アニメーション & inputの変化
@@ -88,5 +88,9 @@ class NumericInput {
         downButtonTriangle.listen('click', function () {
             // アニメーション & inputの変化
         });
+    }
+
+    eraseNumericInput() {
+        this.singleInput.eraseInput();
     }
 }
