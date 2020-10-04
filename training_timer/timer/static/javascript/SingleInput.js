@@ -1,16 +1,13 @@
 class SingleInput {
 
-    constructor(parentLayer, defaultValue, topCenterCoordinate) {
-        this.parentLayer = parentLayer;
-
+    constructor(parentLayer, defaultValue, topCenterCoordinate, topCenterCoordinateRelative) {
         this.inputTopCenterCoordinate = topCenterCoordinate;
+        this.topCenterCoordinateRelative = topCenterCoordinateRelative;
 
         this.input = this._makeNewInput(defaultValue);
         this._resetInputStyle();
 
-        let inputLayerRect = acgraph.rect(this.inputTopCenterCoordinate[0] - (TimerRectSize[0] / 2), this.inputTopCenterCoordinate[1], TimerRectSize[0], InputFontSize + InputUnderbarHeight);
-        this.inputLayer = acgraph.layer().clip(inputLayerRect);
-        this.inputLayer.parent(parentLayer);
+        this.inputLayer = parentLayer.layer();
 
         this.underbar = this._drawNewInputUnderbar(this.input.clientWidth);
     }
@@ -27,7 +24,7 @@ class SingleInput {
     }
 
     _resetInputStyle() {
-        let width = Math.min(this.input.value.length * InputFontSize, this.parentLayer.getAbsoluteWidth());
+        let width = Math.min(this.input.value.length * InputFontSize, TimerRectSize[0]);
 
         let topLeftCoordinate = [this.inputTopCenterCoordinate[0] - (width / 2), this.inputTopCenterCoordinate[1]];
 
@@ -75,5 +72,9 @@ class SingleInput {
         this._resetInputStyle();
 
         this._resetUnderbarPosition();
+    }
+
+    eraseInput() {
+        this.input.remove();
     }
 }

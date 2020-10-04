@@ -26,8 +26,8 @@ class TimerSet {
 
         this.timerStage = acgraph.create('timer_stage');
 
-        this.rectSetLayer = this.timerStage.layer();
-        this.rectSetLayer.zIndex(TimerRectZIndex);
+        this.rectLayer = this.timerStage.layer();
+        this.rectLayer.zIndex(TimerRectZIndex);
 
         this.plusButtonSetLayer = this.timerStage.layer();
         this.plusButtonSetLayer.zIndex(CircleZIndex);
@@ -44,7 +44,7 @@ class TimerSet {
 
     _resetTimerStageDivWidth() {
         let divWidth = FirstRectTopLeftCoordinate[0] + (SingleTimerWidth * this.timerList.length) + TimerMargin;
-        this.timerStageDiv.style.width = Math.max(divWidth, 3000).toString() + "px";
+        this.timerStageDiv.style.width = divWidth.toString() + "px";
     }
 
     _calcTimerTopLeftCoordinate(index) {
@@ -89,7 +89,7 @@ class TimerSet {
 
     _eraseTimer(erasingIndex) {
         if (this.timerList.length > 1) {
-            this.timerList[erasingIndex].rectLayer.dispose();
+            this.timerList[erasingIndex].eraseSingleTimer();
 
             this.timerList.splice(erasingIndex, 1);
 
@@ -119,7 +119,7 @@ class TimerSet {
     }
 
     _createNewTimer(newIndex) {
-        let newSingleTimer = new SingleTimer(this.rectSetLayer, this._calcTimerTopLeftCoordinate(newIndex));
+        let newSingleTimer = new SingleTimer(this.rectLayer, this._calcTimerTopLeftCoordinate(newIndex));
 
         this.timerList.splice(newIndex, 0, newSingleTimer);
 

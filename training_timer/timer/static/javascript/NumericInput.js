@@ -1,18 +1,16 @@
 class NumericInput {
 
-    constructor(parentLayer, defaultNum, keepTwoDigits, topCenterCoordinate) {
+    constructor(parentLayer, defaultNum, keepTwoDigits, defaultTopCenterCoordinate) {
         this.inputNum = defaultNum;
         this.keepTwoDigits = keepTwoDigits;
 
-        this.inputTopCenterCoordinate = topCenterCoordinate;
+        this.topCenterCoordinate = defaultTopCenterCoordinate;
 
         this.singleInput = new SingleInput(parentLayer, this._getPresentInputStr(), this._getSingleInputTopCenterCoordinate());
 
-        const buttonLayerRect = new acgraph.rect(this.inputTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.inputTopCenterCoordinate[1], UpDownTriangleLineLen, UpDownTriangleHeight * 2 + ButtonInputMargin * 2 + InputFontSize);
-        this.buttonLayer = acgraph.layer().clip(buttonLayerRect);
-        this.buttonLayer.parent(parentLayer);
+        this.buttonLayer = parentLayer.layer();
 
-        this.drawUpDownTriangle();
+        this._drawUpDownTriangle();
     }
 
     _getPresentInputStr() {
@@ -38,7 +36,7 @@ class NumericInput {
     }
 
     _getSingleInputTopCenterCoordinate() {
-        return [this.inputTopCenterCoordinate[0], this.inputTopCenterCoordinate[1] + UpDownTriangleHeight + InputTextMargin];
+        return [this.topCenterCoordinate[0], this.topCenterCoordinate[1] + UpDownTriangleHeight + InputTextMargin];
     }
 
     _getDownButtonTriangleTopCoordinate() {
@@ -48,9 +46,10 @@ class NumericInput {
     }
 
     setTopCenterCoordinate(newTopCenterCoordinate) {
-        this.inputTopCenterCoordinate = newTopCenterCoordinate;
+        this.topCenterCoordinate = newTopCenterCoordinate;
 
-        this.buttonLayer.setPosition(newTopCenterCoordinate[0] - UpDownTriangleLineLen / 2, newTopCenterCoordinate[1]);
+        // setPositionとtranslateの違いを検証した方がよさそう
+        this.buttonLayer.setPosition(this.topCenterCoordinate[0] - UpDownTriangleLineLen / 2, this.topCenterCoordinate[1]);
         this.singleInput.setTopCenterCoordinate(this._getSingleInputTopCenterCoordinate());
     }
 
@@ -64,8 +63,8 @@ class NumericInput {
         return [[x1, y1], [x2, y2], [x3, y3]];
     }
 
-    drawTriangle(top_coordinate, is_upward) {
-        const trianglePointsSet = this._getTrianglePointSet(top_coordinate, is_upward);
+    _drawTriangle(topPointCoordinate, isUpward) {
+        const trianglePointsSet = this._getTrianglePointSet(topPointCoordinate, isUpward);
         let triangle = acgraph.path();
         triangle.stroke(0);
         triangle.moveTo(trianglePointsSet[0][0], trianglePointsSet[0][1]);
@@ -78,9 +77,9 @@ class NumericInput {
         return triangle;
     }
 
-    drawUpDownTriangle() {
-        let upButtonTriangle = this.drawTriangle(this.inputTopCenterCoordinate, true);
-        let downButtonTriangle = this.drawTriangle(this._getDownButtonTriangleTopCoordinate(), false);
+    _drawUpDownTriangle() {
+        let upButtonTriangle = this._drawTriangle(this.topCenterCoordinate, true);
+        let downButtonTriangle = this._drawTriangle(this._getDownButtonTriangleTopCoordinate(), false);
 
         upButtonTriangle.listen('click', function () {
             // アニメーション & inputの変化
@@ -89,5 +88,9 @@ class NumericInput {
         downButtonTriangle.listen('click', function () {
             // アニメーション & inputの変化
         });
+    }
+
+    eraseNumericInput() {
+        this.singleInput.eraseInput();
     }
 }
